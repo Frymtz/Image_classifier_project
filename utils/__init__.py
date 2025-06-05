@@ -1,2 +1,1 @@
-from .image_utils import * 
-from .loogger import *
+from .loogger import Logger
