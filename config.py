@@ -1,25 +1,28 @@
 import argparse
 from main import main
+from utils import Logger
 
 if __name__ == "__main__":    
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Configuração do pipeline de processamento e classificação de imagens.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
-    # Dataset loading parameters
-    parser.add_argument('-tr', '--train', nargs=3, metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'), 
-                        type=str, help="Path to training images, labels, and percentage (e.g., ./train_img ./train_lbl 80)")
-    parser.add_argument('-va', '--validation', nargs=3, metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'), 
-                        type=str, help="Path to validation images, labels, and percentage (e.g., ./val_img ./val_lbl 10)")
-    parser.add_argument('-te', '--test', nargs=3, metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'), 
-                        type=str, help="Path to test images, labels, and percentage (e.g., ./test_img ./test_lbl 10)")
+    log = Logger(name="config", level=10)
 
-    # Image processing parameters
+    # Grupos de argumentos
+    group_data = parser.add_argument_group('Parâmetros de Dataset')
+    group_data.add_argument('-tr', '--train', nargs='+', metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'),
+                           type=str, help="Caminho para imagens de treino, labels e porcentagem (ex: ./train_img ./train_lbl [80])")
+    group_data.add_argument('-va', '--validation', nargs='+', metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'),
+                           type=str, help="Caminho para imagens de validação, labels e porcentagem (ex: ./val_img ./val_lbl [10])")
+    group_data.add_argument('-te', '--test', nargs='+', metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'),
+                           type=str, help="Caminho para imagens de teste, labels e porcentagem (ex: ./test_img ./test_lbl [10])")
 
-    # Resize parser: user must specify the target size (width and height)
-    parser.add_argument('--resize', type=int, nargs=2, metavar=('WIDTH', 'HEIGHT'),
-                        help="Resize images to WIDTH x HEIGHT (e.g., 128 96).")
-
-    # Feature extraction parser: user can specify one or more feature extraction techniques
-    parser.add_argument('--features', nargs='+', choices=[
+    group_img = parser.add_argument_group('Parâmetros de Processamento de Imagem')
+    group_img.add_argument('--resize', type=int, nargs=2, metavar=('WIDTH', 'HEIGHT'),
+                          help="Redimensiona imagens para WIDTH x HEIGHT (ex: 128 96).")
+    group_img.add_argument('-ef','--extract_feature', nargs='+', choices=[
         'hog',        # Histogram of Oriented Gradients
         'lbp',        # Local Binary Patterns
         'sift',       # Scale-Invariant Feature Transform
@@ -29,12 +32,30 @@ if __name__ == "__main__":
         'haralick',   # Haralick texture features
         'color_hist', # Color histogram
         'glcm'        # Gray Level Co-occurrence Matrix
-    ], help="Feature extraction techniques: hog, lbp, sift, surf, orb, gabor, haralick, color_hist, glcm")
+    ], help="Técnicas de extração de características: hog, lbp, sift, surf, orb, gabor, haralick, color_hist, glcm")
 
-    # Result parameters
-    parser.add_argument('--result-type', choices=['all', 'accuracy', 'confusion_matrix', 'recall', 'f1_score'], nargs='+', default=['all'],
-                        help="Result types: all, accuracy, confusion_matrix, recall, f1_score")
+    group_result = parser.add_argument_group('Parâmetros de Resultados')
+    group_result.add_argument('--result-type', choices=['all', 'accuracy', 'confusion_matrix', 'recall', 'f1_score'], nargs='+',
+                             help="Tipos de resultado: all, accuracy, confusion_matrix, recall, f1_score")
+
+
+
     args = parser.parse_args()
+    log.info(f"Parsed arguments: {args}")
 
-    #print("Parsing arguments...", args)
-    main (args)
+    # Check if all arguments are None
+    if (
+        (not args.train or all(x is None for x in args.train)) and
+        (not args.validation or all(x is None for x in args.validation)) and
+        (not args.test or all(x is None for x in args.test)) and
+        (not args.resize) and
+        (not args.extract_feature) and
+        (not args.result_type)
+    ):
+        log.error("All arguments are None. Please provide valid arguments.")
+        raise Exception("All arguments are None. Please provide valid arguments.")
+
+
+    log.info("Argument parsing completed successfully.")
+    
+    main(args)

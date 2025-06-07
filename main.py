@@ -1,45 +1,23 @@
 from dataset import *
 from model import *
 from utils import Logger
+from utils import checks as ch
 
 def main(args):
-
+    log = Logger(name="main", level=10)
+    log.info("Stating the program...")
 #---------------------------------------------------------------------------------------------#
-# #Check parsers
-
-    print("Parsing arguments...")
-    print("Train dataset path:", args.train[0])
-    print("Train labels path:", args.train[1])
-    print("Train percentage:", args.train[2])
-
-    print("Validation dataset path:", args.validation[0])
-    print("Validation labels path:", args.validation[1])    
-    print("Validation percentage:", args.validation[2])
-
-    print("Test dataset path:", args.test[0])
-    print("Test labels path:", args.test[1])
-    print("Test percentage:", args.test[2])
-
-    print("Resize dimensions:", args.resize if args.resize else "Not specified")
-    print("Feature extraction techniques:", args.features if args.features else "Not specified")  
-
-    print("Result types:", args.result_type if args.result_type else "Not specified")
-
-
-
-
+#Check parsers
+    # Perform all argument verifications
+    try:
+        train_percent, validation_percent, test_percent=ch.verify_all_args(args)
+    except Exception as e:
+        log = Logger(name="main.checks", level=10)
+        log.error(f"Argument verification failed: {e}")
+        raise
+    log.info("All arguments verified successfully.")
 #---------------------------------------------------------------------------------------------#
-
-
-
-
-
-
-
-    log = Logger(name="main", level=10)  
-    log.info("Iniciando o programa...")
-    log.warning("Isso é um aviso!")
-    log.error("Ocorreu um erro!")
+    print(train_percent, validation_percent, test_percent)
 
 if __name__ == "__main__":
     main()
