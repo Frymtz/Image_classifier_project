@@ -15,7 +15,7 @@ class Logger:
         self.logger = logging.getLogger(name)
         if not self.logger.hasHandlers():
             handler = logging.StreamHandler()
-            formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+            formatter = logging.Formatter('[%(levelname)s] %(message)s')
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
         self.logger.setLevel(level)
