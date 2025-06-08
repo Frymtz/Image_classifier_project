@@ -22,7 +22,7 @@ if __name__ == "__main__":
     group_img = parser.add_argument_group('Parâmetros de Processamento de Imagem')
     group_img.add_argument('--resize', type=int, nargs=2,
                           help="Redimensiona imagens para WIDTH x HEIGHT (ex: 128 96).")
-    group_img.add_argument('-ef','--extract_feature', nargs='+', choices=[
+    group_img.add_argument('-et','--extract_technique', nargs='+', choices=[
         'hog',        # Histogram of Oriented Gradients
         'lbp',        # Local Binary Patterns
         'sift',       # Scale-Invariant Feature Transform
