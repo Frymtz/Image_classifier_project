@@ -46,7 +46,7 @@ class ImageDatasetGenerator:
         df = df.iloc[:n].reset_index(drop=True)
         return df
 
-    def _load_images(self, paths: List[str], base_dir: Optional[str] = None) -> np.ndarray:
+    def _load_images_processImages(self, paths: List[str], base_dir: Optional[str] = None) -> np.ndarray:
         images = []
         dataset_type = "treino" if base_dir == self.train_data_path else "validação" if base_dir == self.validation_data_path else "teste"
         for path in tqdm(paths, desc=f"[INFO] Processing images: {dataset_type}"):
@@ -62,9 +62,9 @@ class ImageDatasetGenerator:
         val_img_dir = val_img_dir if val_img_dir is not None else self.validation_data_path
         test_img_dir = test_img_dir if test_img_dir is not None else self.test_data_path
 
-        train_data = self._load_images(self.train_df['image'].tolist(), train_img_dir)
-        val_data = self._load_images(self.validation_df['image'].tolist(), val_img_dir)
-        test_data = self._load_images(self.test_df['image'].tolist(), test_img_dir)
+        train_data = self._load_images_processImages(self.train_df['image'].tolist(), train_img_dir)
+        val_data = self._load_images_processImages(self.validation_df['image'].tolist(), val_img_dir)
+        test_data = self._load_images_processImages(self.test_df['image'].tolist(), test_img_dir)
 
         with h5py.File(output_path, 'w') as f:
             f.create_dataset('train_data', data=train_data, compression="gzip")

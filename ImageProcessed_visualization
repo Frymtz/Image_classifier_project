@@ -1,0 +1,22 @@
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Caminho para o arquivo HDF5 gerado
+hdf5_path = "Processed_images/image_processed.hdf5"
+
+with h5py.File(hdf5_path, "r") as f:
+    # Supondo que as imagens estejam salvas no dataset 'images'
+    images = f["train_label"][:]  # Ajuste o nome do dataset conforme necessário
+    print(f"Shape das imagens: {images.shape}")
+    # Exibe a primeira imagem
+    img = images[0]
+    print(img)
+    # # Se a imagem estiver normalizada, desfaça a normalização se necessário
+    # if img.max() <= 1.0:
+    #     img = (img * 255).astype(np.uint8)
+
+    # plt.imshow(img)
+    # plt.title("Primeira imagem do HDF5")
+    # plt.axis("off")
+    # plt.show()
