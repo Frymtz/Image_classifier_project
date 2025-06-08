@@ -1,0 +1,3 @@
+[submodule "pyImageFeatures"]
+	path = pyImageFeatures
+	url = https://github.com/giakoumoglou/pyfeats.git
