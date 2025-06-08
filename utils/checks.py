@@ -199,7 +199,7 @@ def verify_all_args(args):
         # Ensure that at least one processing type is specified if datasets are provided
         if not (args.resize or args.extract_technique):
             log.error("You must specify at least one processing type: --resize or --extract_technique.")
-            raise Exception("Processing type (--resize or --extract_technique) is required when train, validation, and test are provided.")
+            raise Exception("Processing type (--resize or/and --extract_technique) is required when train, validation, and test are provided.")
         try:
             check_path(args.train[0], "Invalid training path")
             train_label_path = check_path_label(args.train[1], "Invalid training labels path")
@@ -249,11 +249,6 @@ def verify_all_args(args):
                 log.info("Exiting program as per user request.")
                 sys.exit(0)
 
-        # Ensure that if resize is provided, extract_feature must not be provided (and vice versa)
-        if args.resize is not None and args.extract_technique is not None:
-            log.error("You cannot specify both --resize and --extract_technique at the same time.")
-            raise Exception()
-        
         # Image processing arguments verification
         if args.resize:
             try:

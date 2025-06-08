@@ -6,6 +6,7 @@ from typing import List, Tuple, Optional
 from PIL import Image
 import h5py
 from tqdm import tqdm
+from utils import ImageFeatureExtractor
 
 class ImageDatasetGenerator:
     def __init__(
@@ -46,14 +47,23 @@ class ImageDatasetGenerator:
         df = df.iloc[:n].reset_index(drop=True)
         return df
 
-    def _load_images_processImages(self, paths: List[str], base_dir: Optional[str] = None) -> np.ndarray:
+    def _load_images_processImages(self, paths: List[str], base_dir: Optional[str] = None, mask_list=None, perimeter_list=None) -> np.ndarray:
         images = []
-        dataset_type = "treino" if base_dir == self.train_data_path else "validação" if base_dir == self.validation_data_path else "teste"
-        for path in tqdm(paths, desc=f"[INFO] Processing images: {dataset_type}"):
+        extractor = ImageFeatureExtractor(self.height_width)
+        dataset_type = "Train" if base_dir == self.train_data_path else "Validation" if base_dir == self.validation_data_path else "Test"
+        for idx, path in enumerate(tqdm(paths, desc=f"[INFO] Processing images: {dataset_type}")):
             img_path = os.path.join(base_dir, path) if base_dir else path
             img = Image.open(img_path).convert('RGB')
-            img = img.resize(self.height_width)
-            images.append(np.array(img))
+            # Pegue a máscara e perímetro se necessário
+            mask = mask_list[idx] if mask_list is not None else None
+            perimeter = perimeter_list[idx] if perimeter_list is not None else None
+            features = extractor.extract(
+                img,
+                self.extraction_technique[0],
+                mask=mask,
+                perimeter=perimeter
+            )
+            images.append(features)
         return np.stack(images)
 
     def generate_hdf5(self, output_path: str, train_img_dir=None, val_img_dir=None, test_img_dir=None):
