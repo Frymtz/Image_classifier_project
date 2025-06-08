@@ -30,7 +30,7 @@ def main(args):
 
     #print(f"Train: {train_percent}%, Validation: {validation_percent}%, Test: {test_percent}%")
 #---------------------------------------------------------------------------------------------#
-#Dataset
+#Dataset + Processing
     log.info("Creating dataset...")
     try:
         generator = ImageDatasetGenerator(
@@ -63,6 +63,8 @@ def main(args):
         raise
 
 #---------------------------------------------------------------------------------------------#
+#Classification Model
+
 
 if __name__ == "__main__":
     main()

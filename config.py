@@ -22,18 +22,53 @@ if __name__ == "__main__":
     group_img = parser.add_argument_group('Parâmetros de Processamento de Imagem')
     group_img.add_argument('--resize', type=int, nargs=2,
                           help="Redimensiona imagens para WIDTH x HEIGHT (ex: 128 96).")
-    group_img.add_argument('-et','--extract_technique', nargs='+', choices=[
-        'hog',        # Histogram of Oriented Gradients
-        'lbp',        # Local Binary Patterns
-        'sift',       # Scale-Invariant Feature Transform
-        'surf',       # Speeded-Up Robust Features
-        'orb',        # Oriented FAST and Rotated BRIEF
-        'gabor',      # Gabor filters
-        'haralick',   # Haralick texture features
-        'color_hist', # Color histogram
-        'glcm'        # Gray Level Co-occurrence Matrix
-    ], help="Técnicas de extração de características: hog, lbp, sift, surf, orb, gabor, haralick, color_hist, glcm")
-
+    group_img.add_argument(
+        '-et', '--extract_technique',
+        nargs='+',
+        choices=[
+            'hog', 'lbp', 'sift', 'surf', 'orb', 'gabor', 'haralick', 'color_hist',
+            'glcm', 'fos', 'glds', 'ngtdm', 'sfm', 'lte', 'fdta', 'glrlm', 'fps',
+            'shape', 'glszm', 'hos', 'grayscale_morphology', 'multilevel_binary_morphology',
+            'histogram', 'multiregion_histogram', 'correlogram', 'amfm', 'dwt', 'swt',
+            'wp', 'gt', 'zernikes', 'hu', 'tas'
+        ],
+        help=(
+            "Feature extraction techniques:\n"
+            "hog (Histogram of Oriented Gradients), "
+            "lbp (Local Binary Patterns), "
+            "sift (Scale-Invariant Feature Transform), "
+            "surf (Speeded-Up Robust Features), "
+            "orb (Oriented FAST and Rotated BRIEF), "
+            "gabor (Gabor filters), "
+            "haralick (Haralick texture features), "
+            "color_hist (Color histogram), "
+            "glcm (Gray Level Co-occurrence Matrix), "
+            "fos (First Order Statistics), "
+            "glds (Gray Level Difference Statistics), "
+            "ngtdm (Neighborhood Gray Tone Difference Matrix), "
+            "sfm (Statistical Feature Matrix), "
+            "lte (Law's Texture Energy Measures), "
+            "fdta (Fractal Dimension Texture Analysis), "
+            "glrlm (Gray Level Run Length Matrix), "
+            "fps (Fourier Power Spectrum), "
+            "shape (Shape Parameters), "
+            "glszm (Gray Level Size Zone Matrix), "
+            "hos (Higher Order Spectra), "
+            "grayscale_morphology (Gray-scale Morphological Analysis), "
+            "multilevel_binary_morphology (Multilevel Binary Morphological Analysis), "
+            "histogram (Histogram), "
+            "multiregion_histogram (Multi-region histogram), "
+            "correlogram (Correlogram), "
+            "amfm (Amplitude Modulation – Frequency Modulation), "
+            "dwt (Discrete Wavelet Transform), "
+            "swt (Stationary Wavelet Transform), "
+            "wp (Wavelet Packets), "
+            "gt (Gabor Transform), "
+            "zernikes (Zernikes’ Moments), "
+            "hu (Hu’s Moments), "
+            "tas (Threshold Adjacency Matrix)"
+        )
+    )
     group_result = parser.add_argument_group('Parâmetros de Resultados')
     group_result.add_argument('--result-type', choices=['all', 'accuracy', 'confusion_matrix', 'recall', 'f1_score'], nargs='+',
                              help="Tipos de resultado: all, accuracy, confusion_matrix, recall, f1_score")
