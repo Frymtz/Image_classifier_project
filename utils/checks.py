@@ -1,8 +1,9 @@
 import os
-import re
 from .loogger import Logger
 import cv2
 import glob
+import sys
+import shutil
 
 def check_path(path, error_message):
     """
@@ -66,19 +67,25 @@ def check_porcentage(value, error_message, dataset_path=None):
 
 def check_resize(resize_tuple, error_message):
     """
-    Checks if the resize argument is a tuple of two positive integers.
-
+    Checks if the resize argument is a tuple/list of two positive numbers.
+    
     Args:
-        resize_tuple (tuple): Resize dimensions to check.
+        resize_tuple (tuple or list): Resize dimensions to check.
         error_message (str): Error message to raise if invalid.
 
     Raises:
         Exception: If the resize dimensions are invalid.
+    Returns:
+        tuple: (width, height) as floats
     """
-    if (not isinstance(resize_tuple, (tuple, list)) or
-        len(resize_tuple) != 2 or
-        not all(isinstance(x, int) and x > 0 for x in resize_tuple)):
+    try:
+        width = resize_tuple[0]
+        height = float(resize_tuple[1])
+    except (ValueError, TypeError):
         raise Exception(error_message)
+    if width <= 0 or height <= 0:
+        raise Exception(error_message)
+    return (width, height)
 
 def check_features(features, error_message):
     """
@@ -134,7 +141,7 @@ def verify_all_args(args):
     Raises:
         Exception: If any argument is invalid.
     """
-    log = Logger(name="main.checks", level=10)
+    log = Logger(name="checks", level=10)
 
     log.info("Verifying all arguments...")
     
@@ -144,40 +151,61 @@ def verify_all_args(args):
         if not all(ds is not None for ds in datasets):
             raise Exception("If any of train, validation, or test is provided, all three must be provided.")
 
+        try:
+            check_path(args.train[0], "Invalid training path")
+            check_path(args.train[1], "Invalid training labels path")
+            if len(args.train) > 2:
+                train_percent = check_porcentage(args.train[2], "Invalid training percentage")
+            else:
+                train_percent = 100.0
+        except Exception as e:
+            log.error(f"Error in training arguments: {e}")
+            raise
 
-    # Dataset arguments verification
-    try:
-        check_path(args.train[0], "Invalid training path")
-        check_path(args.train[1], "Invalid training labels path")
-        if len(args.train) > 2:
-            train_percent = check_porcentage(args.train[2], "Invalid training percentage")
-        else:
-            train_percent = 100.0
-    except Exception as e:
-        log.error(f"Error in training arguments: {e}")
-        raise
+        try:
+            check_path(args.validation[0], "Invalid validation path")
+            check_path(args.validation[1], "Invalid validation labels path")
+            if len(args.validation) > 2:
+                validation_percent = check_porcentage(args.validation[2], "Invalid validation percentage")
+            else:
+                validation_percent = 100.0
+        except Exception as e:
+            log.error(f"Error in validation arguments: {e}")
+            raise
 
-    try:
-        check_path(args.validation[0], "Invalid validation path")
-        check_path(args.validation[1], "Invalid validation labels path")
-        if len(args.validation) > 2:
-            validation_percent = check_porcentage(args.validation[2], "Invalid validation percentage")
+        try:
+            check_path(args.test[0], "Invalid test path")
+            check_path(args.test[1], "Invalid test labels path")
+            if len(args.test) > 2:
+                test_percent = check_porcentage(args.test[2], "Invalid test percentage")
+            else:
+                test_percent = 100.0
+        except Exception as e:
+            log.error(f"Error in test arguments: {e}")
+            raise
+    else:
+        # If no dataset arguments are provided, set percentages to None
+        train_percent = validation_percent = test_percent = None
+    
+    # Check if processed dataset already exists
+    processed_images_path = os.path.join(os.getcwd(), 'Processed_images')
+    if not os.path.isdir(processed_images_path):
+        os.makedirs(processed_images_path)
+        log.info(f"Created processed images directory at '{processed_images_path}'.")
+    else:
+        response = input(f"The folder '{processed_images_path}' already exists. Do you want to delete it? (y/n): ").strip().lower()
+        if response == 'y':
+            shutil.rmtree(processed_images_path)
+            os.makedirs(processed_images_path)
+            log.info(f"Deleted and recreated '{processed_images_path}'.")
         else:
-            validation_percent = 100.0
-    except Exception as e:
-        log.error(f"Error in validation arguments: {e}")
-        raise
+            log.info("Exiting program as per user request.")
+            sys.exit(0)
 
-    try:
-        check_path(args.test[0], "Invalid test path")
-        check_path(args.test[1], "Invalid test labels path")
-        if len(args.test) > 2:
-            test_percent = check_porcentage(args.test[2], "Invalid test percentage")
-        else:
-            test_percent = 100.0
-    except Exception as e:
-        log.error(f"Error in test arguments: {e}")
-        raise
+    # Ensure that if resize is provided, extract_feature must not be provided (and vice versa)
+    if args.resize is not None and args.extract_feature is not None:
+        log.error("You cannot specify both --resize and --extract_feature at the same time.")
+        raise Exception()
 
     # Image processing arguments verification
     if args.resize:
@@ -193,8 +221,10 @@ def verify_all_args(args):
                         image_extensions = ('*.jpg', '*.jpeg', '*.png', '*.bmp', '*.tiff', '*.gif')
                         for ext in image_extensions:
                             image_paths.extend(glob.glob(os.path.join(dataset[0], ext)))
+
                     elif os.path.isfile(dataset[0]):
                         image_paths = [dataset[0]]
+                    
                     if image_paths:
                         img = cv2.imread(image_paths[0])
                         if img is not None:
@@ -214,6 +244,7 @@ def verify_all_args(args):
         except Exception as e:
             log.error(f"Error in feature extraction techniques: {e}")
             raise
+    
 
     # Result types verification
     if args.result_type:
