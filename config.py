@@ -12,15 +12,15 @@ if __name__ == "__main__":
 
     # Grupos de argumentos
     group_data = parser.add_argument_group('Parâmetros de Dataset')
-    group_data.add_argument('-tr', '--train', nargs='+', metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'),
+    group_data.add_argument('-tr', '--train', nargs='+',
                            type=str, help="Caminho para imagens de treino, labels e porcentagem (ex: ./train_img ./train_lbl [80])")
-    group_data.add_argument('-va', '--validation', nargs='+', metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'),
+    group_data.add_argument('-va', '--validation', nargs='+',
                            type=str, help="Caminho para imagens de validação, labels e porcentagem (ex: ./val_img ./val_lbl [10])")
-    group_data.add_argument('-te', '--test', nargs='+', metavar=('DATA_PATH', 'LABEL_PATH', 'PERCENT'),
+    group_data.add_argument('-te', '--test', nargs='+',
                            type=str, help="Caminho para imagens de teste, labels e porcentagem (ex: ./test_img ./test_lbl [10])")
 
     group_img = parser.add_argument_group('Parâmetros de Processamento de Imagem')
-    group_img.add_argument('--resize', type=int, nargs=2, metavar=('WIDTH', 'HEIGHT'),
+    group_img.add_argument('--resize', type=int, nargs=2,
                           help="Redimensiona imagens para WIDTH x HEIGHT (ex: 128 96).")
     group_img.add_argument('-ef','--extract_feature', nargs='+', choices=[
         'hog',        # Histogram of Oriented Gradients
@@ -38,10 +38,7 @@ if __name__ == "__main__":
     group_result.add_argument('--result-type', choices=['all', 'accuracy', 'confusion_matrix', 'recall', 'f1_score'], nargs='+',
                              help="Tipos de resultado: all, accuracy, confusion_matrix, recall, f1_score")
 
-
-
     args = parser.parse_args()
-    log.info(f"Parsed arguments: {args}")
 
     # Check if all arguments are None
     if (
@@ -55,7 +52,4 @@ if __name__ == "__main__":
         log.error("All arguments are None. Please provide valid arguments.")
         raise Exception("All arguments are None. Please provide valid arguments.")
 
-
-    log.info("Argument parsing completed successfully.")
-    
     main(args)
