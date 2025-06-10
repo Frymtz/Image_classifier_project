@@ -51,6 +51,9 @@ class ImageDatasetGenerator:
         images = []
         extractor = ImageFeatureExtractor(self.height_width)
         dataset_type = "Train" if base_dir == self.train_data_path else "Validation" if base_dir == self.validation_data_path else "Test"
+        
+        extraction_technique = None if not self.extraction_technique else self.extraction_technique[0].lower()
+
         for idx, path in enumerate(tqdm(paths, desc=f"[INFO] Processing images: {dataset_type}")):
             img_path = os.path.join(base_dir, path) if base_dir else path
             img = Image.open(img_path).convert('RGB')
@@ -59,7 +62,7 @@ class ImageDatasetGenerator:
             perimeter = perimeter_list[idx] if perimeter_list is not None else None
             features = extractor.extract(
                 img,
-                self.extraction_technique[0],
+                extraction_technique,
                 mask=mask,
                 perimeter=perimeter
             )
