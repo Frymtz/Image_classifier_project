@@ -1,3 +1,4 @@
+from cycler import K
 from matplotlib.pylab import f
 from dataset import ImageDatasetGenerator
 from model import  RandomForestModel
@@ -5,6 +6,7 @@ from utils import Logger
 from utils import checks as ch
 import os
 from tqdm import tqdm
+from model import KNNModel, SVMModel, HardVotingEnsemble
 
 def create_generator(args, extention, train_label_path, train_percent, validation_label_path, validation_percent,
                     test_label_path, test_percent, height_width, extraction_technique):
@@ -62,7 +64,7 @@ def main(args):
         test_percent = arg_results.get("test_percent")
         height_width = arg_results.get("resize_dims")
         extraction_technique = arg_results.get("extraction_technique")
-        result_type = arg_results.get("result_type")
+        model = arg_results.get("model")
     except Exception as e:
         log = Logger(name="main.checks", level=10)
         log.error(f"Argument verification failed: {e}")
@@ -88,8 +90,7 @@ def main(args):
         except Exception as e:
             log.error(f"Failed to create dataset generator: {e}")
             raise
-
-    #---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
     # Generate HDF5 file
         try:
             output_path = os.path.join(os.getcwd(), "Processed_images/image_processed.hdf5")
@@ -116,26 +117,57 @@ def main(args):
             # X_test = flatten_features(data['test_data'])
             #y_test = data['test_label']
             log.info("Data loaded successfully.")
-            rf_model = RandomForestModel()
-            rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+
+            if model.lower() == "rf":
+                log.info("Training Random Forest model...")
+                rf_model = RandomForestModel()
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                metrics = rf_model.score(X_test, y_test)
+                print(f"Random Forest F1-score: {metrics['f1']}")
+
+            elif model.lower() == "knn":   
+                log.info("Training KNN model...")
+                knn_model = KNNModel()
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                metrics = knn_model.score(X_test, y_test)
+                print(f"KNN F1-score: {metrics['f1']}")
+            elif model.lower() == "svm":
+                log.info("Training SVM model...")
+                svm_model = SVMModel()
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                metrics = svm_model.score(X_test, y_test)
+                print(f"SVM F1-score: {metrics['f1']}")
+            else:
+                rf_model = RandomForestModel()
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                knn_model = KNNModel()
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                svm_model = SVMModel()
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                ensemble = HardVotingEnsemble([rf_model, knn_model, svm_model])
+                # ensemble_f1 = ensemble.score(X_test, y_test)
+                # print(f"Ensemble F1-score: {ensemble_f1}")
+
         except Exception as e:
             log.error(f"Failed to load data or train model: {e}")
             raise
 
     else:
-        # extraction_options = [
-        #     ["raw"], ["fos"], ["glcm"], ["glds"], ["ngtdm"], ["sfm"], ["lte"], ["fdta"],
-        #     ["glrlm"], ["fps"], ["shape"], ["glszm"], ["hos"], ["lbp"], ["grayscale_morphology"],
-        #     ["multilevel_binary_morphology"], ["histogram"], ["multiregion_histogram"],
-        #     ["correlogram"], ["amfm"], ["dwt"], ["swt"], ["wp"], ["gt"], ["zernikes"], ["hu"], ["tas"], ["hog"]
-        # ]
-
         extraction_options = [
-            ["raw"], ["glcm"] 
+            ["raw"], ["fos"], ["glcm"], ["glds"], ["ngtdm"], ["sfm"], ["lte"], ["fdta"],
+            ["glrlm"], ["fps"], ["shape"], ["glszm"], ["hos"], ["lbp"], ["grayscale_morphology"],
+            ["multilevel_binary_morphology"], ["histogram"], ["multiregion_histogram"],
+            ["correlogram"], ["amfm"], ["dwt"], ["swt"], ["wp"], ["gt"], ["zernikes"], ["hu"], ["tas"], ["hog"]
         ]
 
+        # extraction_options = [
+        #     ["raw"], ["glcm"] 
+        # ]
+
         resize_options = [height_width, None]
-        best_f1 = -1
+        best_f1_rt = -1
+        best_f1_svm = -1
+        best_f1_knn = -1
         best_config = None
 
         for technique in extraction_options:
@@ -163,12 +195,16 @@ def main(args):
             validation_label_path, validation_percent,
             test_label_path, test_percent, best_config[1], best_config[0]
         )
-        output_path = os.path.join(
-            os.getcwd(), f"Processed_images/image_processed_{best_config[0]}_{best_config[1]}.hdf5"
-        )
+        output_path = None
+
         _, rf_model, X_test, y_test = process_and_train(generator, output_path, False, log, fit_trials=50, return_test=True)
 
+
+        
+        
         # UNCOMMENT ONLY IF YOU ALREADY HAVE THE BEST MODEL AND PRE-PROCESSED DATA
+        # ensemble = HardVotingEnsemble([rf_model, knn_model, svm_model])
+        # ensemble_f1 = ensemble.score(X_test, y_test)
         # y_pred = rf_model.predict(X_test)
         # metrics = rf_model.score(X_test, y_test)
 

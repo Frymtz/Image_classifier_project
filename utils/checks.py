@@ -153,23 +153,27 @@ def check_features(technique, error_message):
         raise Exception(error_message)
     return technique 
 
-def check_result_types(result_type, error_message):
+def check_model(model, error_message):
     """
-    Checks if the result_type argument contains valid result types.
+    Checks if the model argument contains valid model types.
 
     Args:
-        result_type (list or str): Result types to check.
+        model (list or str): Model types to check.
         error_message (str): Error message to raise if invalid.
 
     Raises:
-        Exception: If any result type is invalid.
+        Exception: If any model type is invalid.
+    Returns:
+        list: Validated model types.
     """
-    valid_types = {"all", "accuracy", "confusion_matrix", "recall", "f1_score"}
-    if isinstance(result_type, str):
-        result_type = [result_type]
-    if not all(rt in valid_types for rt in result_type):
+    valid_models = {
+        "svm", "random_forest", "knn", "ensemble"
+    }
+    if isinstance(model, str):
+        model = [model]
+    if not all(m in valid_models for m in model):
         raise Exception(error_message)
-    return result_type 
+    return model
 
 def verify_all_args(args):
     """
@@ -286,12 +290,12 @@ def verify_all_args(args):
         # If no dataset arguments are provided, set percentages to None
         train_percent = validation_percent = test_percent = None
     
-    # Result types verification
-    if args.result_type:
+    # Model verification
+    if args.model:
         try:
-            result_type = check_result_types(args.result_type, "Invalid result type")
+            model = check_model(args.model, "Invalid result type")
         except Exception as e:
-            log.error(f"Error in result types: {e}")
+            log.error(f"Error in model: {e}")
             raise
     return {
         "train_label_path": train_label_path if 'train_label_path' in locals() else None,
@@ -303,6 +307,6 @@ def verify_all_args(args):
         "test_percent": test_percent if 'test_percent' in locals() else None,
         "resize_dims": height_width if 'height_width' in locals() else None,
         "extraction_technique": extraction_technique if 'extraction_technique' in locals() else None,
-        "result_type": result_type if 'result_type' in locals() else None
+        "result_type": model if 'result_type' in locals() else None
     }
 

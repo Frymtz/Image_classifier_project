@@ -4,24 +4,24 @@ from utils import Logger
 
 if __name__ == "__main__":    
     parser = argparse.ArgumentParser(
-        description="Configuração do pipeline de processamento e classificação de imagens.",
+        description="Configuration for the image processing and classification pipeline.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     log = Logger(name="config", level=10)
 
-    # Grupos de argumentos
-    group_data = parser.add_argument_group('Parâmetros de Dataset')
+    # Argument groups
+    group_data = parser.add_argument_group('Dataset Parameters')
     group_data.add_argument('-tr', '--train', nargs='+',
-                           type=str, help="Caminho para imagens de treino, labels e porcentagem (ex: ./train_img ./train_lbl [80])")
+                           type=str, help="Path to training images, labels, and percentage (e.g.: ./train_img ./train_lbl [80])")
     group_data.add_argument('-va', '--validation', nargs='+',
-                           type=str, help="Caminho para imagens de validação, labels e porcentagem (ex: ./val_img ./val_lbl [10])")
+                           type=str, help="Path to validation images, labels, and percentage (e.g.: ./val_img ./val_lbl [10])")
     group_data.add_argument('-te', '--test', nargs='+',
-                           type=str, help="Caminho para imagens de teste, labels e porcentagem (ex: ./test_img ./test_lbl [10])")
+                           type=str, help="Path to test images, labels, and percentage (e.g.: ./test_img ./test_lbl [10])")
 
-    group_img = parser.add_argument_group('Parâmetros de Processamento de Imagem')
+    group_img = parser.add_argument_group('Image Processing Parameters')
     group_img.add_argument('--resize', type=int, nargs=2,
-                          help="Redimensiona imagens para WIDTH x HEIGHT (ex: 128 96).")
+                          help="Resize images to WIDTH x HEIGHT (e.g.: 128 96).")
     group_img.add_argument(
         '-et', '--extract_technique',
         nargs='+',
@@ -70,9 +70,9 @@ if __name__ == "__main__":
             "best_feature (Best Feature Selection Automatically)"
         )
     )
-    group_result = parser.add_argument_group('Parâmetros de Resultados')
-    group_result.add_argument('--result-type', choices=['all', 'accuracy', 'confusion_matrix', 'recall', 'f1_score'], nargs='+',
-                             help="Tipos de resultado: all, accuracy, confusion_matrix, recall, f1_score")
+    group_models = parser.add_argument_group('Model Parameters')
+    group_models.add_argument('--model', choices=['random_florest', 'knn', 'svm', 'ensemble'], nargs='+',
+                             help="Choose model(s): random_florest, knn, svm, ensemble")
 
     args = parser.parse_args()
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         (not args.test or all(x is None for x in args.test)) and
         (not args.resize) and
         (not args.extract_feature) and
-        (not args.result_type)
+        (not args.model)
     ):
         log.error("All arguments are None. Please provide valid arguments.")
         raise Exception("All arguments are None. Please provide valid arguments.")
