@@ -30,7 +30,7 @@ if __name__ == "__main__":
             'glcm', 'fos', 'glds', 'ngtdm', 'sfm', 'lte', 'fdta', 'glrlm', 'fps',
             'shape', 'glszm', 'hos', 'grayscale_morphology', 'multilevel_binary_morphology',
             'histogram', 'multiregion_histogram', 'correlogram', 'amfm', 'dwt', 'swt',
-            'wp', 'gt', 'zernikes', 'hu', 'tas'
+            'wp', 'gt', 'zernikes', 'hu', 'tas', 'best_feature'
         ],
         help=(
             "Feature extraction techniques:\n"
@@ -66,7 +66,8 @@ if __name__ == "__main__":
             "gt (Gabor Transform), "
             "zernikes (Zernikes’ Moments), "
             "hu (Hu’s Moments), "
-            "tas (Threshold Adjacency Matrix)"
+            "tas (Threshold Adjacency Matrix),"
+            "best_feature (Best Feature Selection Automatically)"
         )
     )
     group_result = parser.add_argument_group('Parâmetros de Resultados')

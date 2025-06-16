@@ -142,15 +142,10 @@ def check_features(technique, error_message):
         Exception: If any feature extraction technique is invalid.
     """
     valid_techniques = {
-        "hog",
-        "lbp",
-        "sift",
-        "surf",
-        "orb",
-        "gabor",
-        "haralick",
-        "color_hist",
-        "glcm"
+        "raw", "fos", "glcm", "glds", "ngtdm", "sfm", "lte", "fdta",
+        "glrlm", "fps", "shape", "glszm", "hos", "lbp", "grayscale_morphology",
+        "multilevel_binary_morphology", "histogram", "multiregion_histogram",
+        "correlogram", "amfm", "dwt", "swt", "wp", "gt", "zernikes", "hu", "tas", "hog","best_feature"
     }
     if isinstance(technique, str):
         technique = [technique]

@@ -53,7 +53,6 @@ class ImageDatasetGenerator:
         dataset_type = "Train" if base_dir == self.train_data_path else "Validation" if base_dir == self.validation_data_path else "Test"
         
         extraction_technique = None if not self.extraction_technique else self.extraction_technique[0].lower()
-
         for idx, path in enumerate(tqdm(paths, desc=f"[INFO] Processing images: {dataset_type}")):
             img_path = os.path.join(base_dir, path) if base_dir else path
             img = Image.open(img_path).convert('RGB')
@@ -69,7 +68,7 @@ class ImageDatasetGenerator:
             images.append(features)
         return np.stack(images)
 
-    def generate_hdf5(self, output_path: str, train_img_dir=None, val_img_dir=None, test_img_dir=None):
+    def generate_hdf5(self, output_path: str, create_hdf5: bool, train_img_dir=None, val_img_dir=None, test_img_dir=None):
         # Use the provided directory or default to the data path attributes
         train_img_dir = train_img_dir if train_img_dir is not None else self.train_data_path
         val_img_dir = val_img_dir if val_img_dir is not None else self.validation_data_path
@@ -78,7 +77,14 @@ class ImageDatasetGenerator:
         train_data = self._load_images_processImages(self.train_df['image'].tolist(), train_img_dir)
         val_data = self._load_images_processImages(self.validation_df['image'].tolist(), val_img_dir)
         test_data = self._load_images_processImages(self.test_df['image'].tolist(), test_img_dir)
+        
+        if not create_hdf5:
+            train_labels = np.array(self.train_df['MEL'].tolist())
+            val_labels = np.array(self.validation_df['MEL'].tolist())
+            test_labels = np.array(self.test_df['MEL'].tolist())
 
+            return train_data, val_data, test_data, train_labels, val_labels, test_labels 
+           
         with h5py.File(output_path, 'w') as f:
             f.create_dataset('train_data', data=train_data, compression="gzip")
             f.create_dataset('train_label', data=np.array(self.train_df['MEL'].tolist()), compression="gzip")
@@ -86,3 +92,19 @@ class ImageDatasetGenerator:
             f.create_dataset('validation_label', data=np.array(self.validation_df['MEL'].tolist()), compression="gzip")
             f.create_dataset('test_data', data=test_data, compression="gzip")
             f.create_dataset('test_label', data=np.array(self.test_df['MEL'].tolist()), compression="gzip")
+    
+    def load_hdf5(self, hdf5_path: str):
+        """
+        Load datasets from an HDF5 file.
+        Returns a dictionary with keys:
+        'train_data', 'train_label', 'validation_data', 'validation_label', 'test_data', 'test_label'
+        """
+        data = {}
+        with h5py.File(hdf5_path, 'r') as f:
+            data['train_data'] = f['train_data'][:]
+            data['train_label'] = f['train_label'][:]
+            data['validation_data'] = f['validation_data'][:]
+            data['validation_label'] = f['validation_label'][:]
+            data['test_data'] = f['test_data'][:]
+            data['test_label'] = f['test_label'][:]
+        return data
