@@ -71,8 +71,8 @@ if __name__ == "__main__":
         )
     )
     group_models = parser.add_argument_group('Model Parameters')
-    group_models.add_argument('--model', choices=['random_florest', 'knn', 'svm', 'ensemble'], nargs='+',
-                             help="Choose model(s): random_florest, knn, svm, ensemble")
+    group_models.add_argument('--model', choices=['random_forest', 'knn', 'svm', 'ensemble'], nargs='+',
+                             help="Choose model(s): random_forest, knn, svm, ensemble")
 
     args = parser.parse_args()
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         (not args.validation or all(x is None for x in args.validation)) and
         (not args.test or all(x is None for x in args.test)) and
         (not args.resize) and
-        (not args.extract_feature) and
+        (not args.extract_technique) and
         (not args.model)
     ):
         log.error("All arguments are None. Please provide valid arguments.")

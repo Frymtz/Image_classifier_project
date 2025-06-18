@@ -2,24 +2,32 @@ import logging
 
 class Logger:
     """
-    Classe utilitária para facilitar o uso do logging no terminal.
-    Permite configurar o nível de log e usar diferentes loggers nomeados.
+    Utility class to simplify logging usage in the terminal.
+    Allows configuring the log level and using different named loggers.
     """
 
     def __init__(self, name: str = None, level: int = logging.INFO):
         """
-        Inicializa o logger.
-        :param name: Nome do logger (None para root logger).
-        :param level: Nível mínimo das mensagens (ex: logging.INFO).
+        Initializes the logger.
+        :param name: Logger name (None for root logger).
+        :param level: Minimum message level (e.g., logging.INFO).
         """
         self.logger = logging.getLogger(name)
         if not self.logger.hasHandlers():
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter('[%(levelname)s] %(message)s')
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
+            # Console handler
+            stream_handler = logging.StreamHandler()
+            stream_formatter = logging.Formatter('[%(levelname)s] %(message)s')
+            stream_handler.setFormatter(stream_formatter)
+            self.logger.addHandler(stream_handler)
+
+            # File handler
+            file_handler = logging.FileHandler('LOG_TXT/log.txt', encoding='utf-8')
+            file_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+            file_handler.setFormatter(file_formatter)
+            self.logger.addHandler(file_handler)
+
         self.logger.setLevel(level)
-        self.logger.propagate = False  # Evita mensagens duplicadas
+        self.logger.propagate = False  
 
     def info(self, msg, *args, **kwargs):
         """Loga uma mensagem de informação."""

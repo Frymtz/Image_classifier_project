@@ -3,6 +3,7 @@ import optuna
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 class RandomForestModel:
     def __init__(self, n_estimators=100, random_state=None):
@@ -26,10 +27,9 @@ class RandomForestModel:
                     'random_state': 42
                 }
                 model = RandomForestClassifier(**params)
-                model.fit(X_train, y_train)
-                preds = model.predict(X_val)
-                score = f1_score(y_val, preds, average='weighted')
-                return score
+                cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+                scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='f1_weighted')
+                return scores.mean()
 
             study = optuna.create_study(direction='maximize')
             study.optimize(objective, n_trials=n_trials)
