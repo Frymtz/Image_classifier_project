@@ -1,2 +1,2 @@
-from .Random_Florest import RandomForestModel
+from .Random_Forest import RandomForestModel
 from .Ensemble import HardVotingEnsemble

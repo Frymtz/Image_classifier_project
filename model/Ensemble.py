@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import mode
 from sklearn.metrics import f1_score
+from sklearn.metrics import precision_score, recall_score, confusion_matrix, roc_auc_score
 
 class HardVotingEnsemble:
     def __init__(self, models):
@@ -23,4 +24,19 @@ class HardVotingEnsemble:
         Calculates the F1-score of the ensemble.
         """
         y_pred = self.predict(X)
-        return f1_score(y_true, y_pred, average=average)
+        precision = precision_score(y_true, y_pred, average=average, zero_division=0)
+        recall = recall_score(y_true, y_pred, average=average, zero_division=0)
+        f1 = f1_score(y_true, y_pred, average=average)
+        cm = confusion_matrix(y_true, y_pred)
+        try:
+            roc_auc = roc_auc_score(y_true, y_pred, average=average, multi_class='ovr')
+        except Exception:
+            roc_auc = None
+
+        return {
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1,
+            'confusion_matrix': cm,
+            'roc_auc': roc_auc
+        }
