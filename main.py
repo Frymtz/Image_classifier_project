@@ -153,13 +153,6 @@ def main(args):
             raise
 
     else:
-        extraction_options = [
-            ["raw"], ["fos"], ["glcm"], ["glds"], ["ngtdm"], ["sfm"], ["lte"], ["fdta"],
-            ["glrlm"], ["fps"], ["shape"], ["glszm"], ["hos"], ["lbp"], ["grayscale_morphology"],
-            ["multilevel_binary_morphology"], ["histogram"], ["multiregion_histogram"],
-            ["correlogram"], ["amfm"], ["dwt"], ["swt"], ["wp"], ["gt"], ["zernikes"], ["hu"], ["tas"], ["hog"]
-        ]
-
         # extraction_options = [
         #     ["raw"], ["glcm"] 
         # ]
