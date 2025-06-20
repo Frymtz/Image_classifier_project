@@ -292,6 +292,12 @@ def verify_all_args(args):
     
     # Model verification
     if args.model:
+        if args.extract_technique and (
+            (isinstance(args.extract_technique, str) and args.extract_technique == "best_feature") or
+            (isinstance(args.extract_technique, (list, tuple)) and "best_feature" in args.extract_technique)
+        ):
+            if args.model:
+                raise Exception("If --extract_technique is 'best_feature', --model must not be specified.")
         try:
             model = check_model(args.model, "Invalid model type")
         except Exception as e:
