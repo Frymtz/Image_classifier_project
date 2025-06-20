@@ -71,8 +71,8 @@ if __name__ == "__main__":
         )
     )
     group_models = parser.add_argument_group('Model Parameters')
-    group_models.add_argument('--model', choices=['random_forest', 'knn', 'svm', 'ensemble'], nargs='+',
-                             help="Choose model(s): random_forest, knn, svm, ensemble")
+    group_models.add_argument('--model', choices=['rf', 'knn', 'svm', 'ensemble'], nargs='+',
+                             help="Choose model(s): rf, knn, svm, ensemble")
 
     args = parser.parse_args()
 

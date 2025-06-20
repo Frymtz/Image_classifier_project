@@ -3,31 +3,26 @@ import optuna
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 class KNNModel:
-    def __init__(self, n_neighbors=5, random_state=None):
+    def __init__(self, n_neighbors=5):
         self.model = KNeighborsClassifier(n_neighbors=n_neighbors)
 
     def fit(self, X_train, y_train, X_val=None, y_val=None, use_optuna=False, n_trials=50):
         if use_optuna and X_val is not None and y_val is not None:
-
-            # Compute class weights for imbalanced data
-            classes = np.unique(y_train)
-            class_weights = compute_class_weight(class_weight='balanced', classes=classes, y=y_train)
-            class_weight_dict = dict(zip(classes, class_weights))
 
             def objective(trial):
                 params = {
                     'n_neighbors': trial.suggest_int('n_neighbors', 1, 20),
                     'weights': trial.suggest_categorical('weights', ['uniform', 'distance']),
                     'metric': trial.suggest_categorical('metric', ['euclidean', 'manhattan', 'minkowski']),
-                    'n_jobs': -1
+                    'n_jobs': -1,
                 }
                 model = KNeighborsClassifier(**params)
-                model.fit(X_train, y_train)
-                preds = model.predict(X_val)
-                score = f1_score(y_val, preds, average='weighted')
-                return score
+                cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+                scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='f1_weighted')
+                return scores.mean()
             
             study = optuna.create_study(direction='maximize')
             study.optimize(objective, n_trials=n_trials)

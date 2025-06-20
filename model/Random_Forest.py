@@ -23,6 +23,7 @@ class RandomForestModel:
                     'max_depth': trial.suggest_int('max_depth', 2, 20),
                     'min_samples_split': trial.suggest_int('min_samples_split', 2, 20),
                     'min_samples_leaf': trial.suggest_int('min_samples_leaf', 3, 20),
+                    'n_jobs': -1,
                     'class_weight': class_weight_dict,
                     'random_state': 42
                 }
@@ -37,6 +38,7 @@ class RandomForestModel:
             best_f1_score = study.best_value
             best_params['class_weight'] = class_weight_dict
             best_params['random_state'] = 42
+            best_params['n_jobs'] = -1 
             self.model = RandomForestClassifier(**best_params)
             self.model.fit(X_train, y_train)
             print(f"F1 SCORE: ",best_f1_score)

@@ -141,12 +141,12 @@ def check_features(technique, error_message):
     Raises:
         Exception: If any feature extraction technique is invalid.
     """
-    valid_techniques = {
+    valid_techniques = [
         "raw", "fos", "glcm", "glds", "ngtdm", "sfm", "lte", "fdta",
         "glrlm", "fps", "shape", "glszm", "hos", "lbp", "grayscale_morphology",
         "multilevel_binary_morphology", "histogram", "multiregion_histogram",
         "correlogram", "amfm", "dwt", "swt", "wp", "gt", "zernikes", "hu", "tas", "hog","best_feature"
-    }
+    ]
     if isinstance(technique, str):
         technique = [technique]
     if not all(f in valid_techniques for f in technique):
@@ -167,7 +167,7 @@ def check_model(model, error_message):
         list: Validated model types.
     """
     valid_models = {
-        "svm", "random_forest", "knn", "ensemble"
+        "svm", "rf", "knn", "ensemble"
     }
     if isinstance(model, str):
         model = [model]
@@ -293,7 +293,7 @@ def verify_all_args(args):
     # Model verification
     if args.model:
         try:
-            model = check_model(args.model, "Invalid result type")
+            model = check_model(args.model, "Invalid model type")
         except Exception as e:
             log.error(f"Error in model: {e}")
             raise
@@ -307,6 +307,6 @@ def verify_all_args(args):
         "test_percent": test_percent if 'test_percent' in locals() else None,
         "resize_dims": height_width if 'height_width' in locals() else None,
         "extraction_technique": extraction_technique if 'extraction_technique' in locals() else None,
-        "result_type": model if 'result_type' in locals() else None
+        "model": model if 'model' in locals() else None
     }
 

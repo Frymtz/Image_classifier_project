@@ -1,10 +1,9 @@
-from dataset import ImageDatasetGenerator
-from model import  RandomForestModel
+import os
 from utils import Logger
 from utils import checks as ch
-import os
-from model import  HardVotingEnsemble
-#from model import KNNModel, SVMModel
+from dataset import ImageDatasetGenerator
+from model import  RandomForestModel, HardVotingEnsemble, KNNModel
+
 
 def create_generator(args, extention, train_label_path, train_percent, validation_label_path, validation_percent,
                     test_label_path, test_percent, height_width, extraction_technique):
@@ -42,7 +41,7 @@ def process_and_train(generator, output_path, create_hdf5, model, fit_trials=50,
 
     model_map = {
         "rf": RandomForestModel,
-        # "knn": KNNModel,
+        "knn": KNNModel,
         # "svm": SVMModel,
     }
 
@@ -77,6 +76,7 @@ def main(args):
         log.error(f"Argument verification failed: {e}")
         raise
     log.info("All arguments verified successfully.")
+
 #---------------------------------------------------------------------------------------------#
 #Dataset + Processing
 
@@ -125,20 +125,21 @@ def main(args):
             #y_test = data['test_label']
             log.info("Data loaded successfully.")
 
-            if model.lower() == "rf":
+            if model[0].lower() == "rf":
                 log.info("Training Random Forest model...")
                 rf_model = RandomForestModel()
                 rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
-                # metrics = rf_model.score(X_val, y_val)
+                # metrics = rf_model.score(X_test, y_test)
                 # log.info(f"Random Forest Metrics - F1-score: {metrics.get('f1')}, Accuracy: {metrics.get('accuracy')}, Precision: {metrics.get('precision')}, Recall: {metrics.get('recall')}")
 
-            # elif model.lower() == "knn":   
-            #     log.info("Training KNN model...")
-            #     knn_model = KNNModel()
-            #     knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
-            #     # metrics = knn_model.score(X_test, y_test)
-            #     # log.info(f"KNN Metrics - F1-score: {metrics.get('f1')}, Accuracy: {metrics.get('accuracy')}, Precision: {metrics.get('precision')}, Recall: {metrics.get('recall')}")
-            # elif model.lower() == "svm":
+            elif model[0].lower() == "knn":   
+                log.info("Training KNN model...")
+                knn_model = KNNModel()
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                # metrics = knn_model.score(X_test, y_test)
+                # log.info(f"KNN Metrics - F1-score: {metrics.get('f1')}, Accuracy: {metrics.get('accuracy')}, Precision: {metrics.get('precision')}, Recall: {metrics.get('recall')}")
+  
+            # elif model[0].lower() == "svm":
             #     log.info("Training SVM model...")
             #     svm_model = SVMModel()
             #     svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
@@ -174,8 +175,9 @@ def main(args):
         # resize_options = [height_width, None]
         resize_options = [height_width]
         best_f1_rf = -1
-        best_f1_svm = -1
         best_f1_knn = -1
+        best_f1_svm = -1
+        
 
         best_config = dict()
 
@@ -189,18 +191,18 @@ def main(args):
                     )
                     output_path = None
                     f1_rf, _ = process_and_train(generator, output_path, False, model ="rf", fit_trials=20)
-                    # f1_knn, knn_model = process_and_train(generator, output_path, False, model="knn", fit_trials=20 )
+                    f1_knn, knn_model = process_and_train(generator, output_path, False, model="knn", fit_trials=20 )
                     # f1_svm, svm_model = process_and_train(generator, output_path, False, model="svm", fit_trials=20 )
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: RANDOM FOREST: {f1_rf}")
-                    # log.info(f"F1-score for {technique} | Resize: {resize} | Model: RANDOM FOREST: {f1_knn}")
+                    log.info(f"F1-score for {technique} | Resize: {resize} | Model: KNN: {f1_knn}")
                     # log.info(f"F1-score for {technique} | Resize: {resize} | Model: RANDOM FOREST: {f1_svm}")     
                     
                     if f1_rf > best_f1_rf:
                         best_f1_rf = f1_rf
                         best_config['rf'] = {'technique': technique, 'resize': resize}
-                    # if f1_knn > best_f1_knn:
-                    #     best_f1_knn = f1_knn
-                    #     best_config['knn'] = {'technique': technique, 'resize': resize}
+                    if f1_knn > best_f1_knn:
+                        best_f1_knn = f1_knn
+                        best_config['knn'] = {'technique': technique, 'resize': resize}
                     # if f1_svm > best_f1_svm:
                     #     best_f1_svm = f1_svm
                     #     best_config['svm'] = {'technique': technique, 'resize': resize}
@@ -209,7 +211,7 @@ def main(args):
                     log.error(f"Error with extraction {technique} and resize {resize}: {e}")
 
         log.info(f"Random Forest - Technique: {best_config['rf']['technique']} | Resize: {best_config['rf']['resize']} | F1-score: {best_f1_rf}")
-        # log.info(f"KNN - Technique: {best_config['knn']['technique']} | Resize: {best_config['knn']['resize']} | F1-score: {best_f1_knn}")
+        log.info(f"KNN - Technique: {best_config['knn']['technique']} | Resize: {best_config['knn']['resize']} | F1-score: {best_f1_knn}")
         # log.info(f"SVM - Technique: {best_config['svm']['technique']} | Resize: {best_config['svm']['resize']} | F1-score: {best_f1_svm}")
 
         # Final training with best config
@@ -225,17 +227,17 @@ def main(args):
 
         _, rf_model, X_test, y_test = process_and_train(generator, output_path, False, model="rf", fit_trials=50, return_test=True)
         
-        # knn_model = None
+        knn_model = None
         # svm_model = None
 
-        # # Train KNN model with best config
-        # log.info("Training KNN model with best configuration...")
-        # generator_knn = create_generator(
-        #     args, extention, train_label_path, train_percent,
-        #     validation_label_path, validation_percent,
-        #     test_label_path, test_percent, best_config['knn']['resize'], best_config['knn']['technique']
-        # )
-        # _, knn_model, _, _ = process_and_train(generator_knn, output_path, False, model="knn", fit_trials=50, return_test=True)
+        # Train KNN model with best config
+        log.info("Training KNN model with best configuration...")
+        generator_knn = create_generator(
+            args, extention, train_label_path, train_percent,
+            validation_label_path, validation_percent,
+            test_label_path, test_percent, best_config['knn']['resize'], best_config['knn']['technique']
+        )
+        _, knn_model, _, _ = process_and_train(generator_knn, output_path, False, model="knn", fit_trials=50, return_test=True)
 
         # # Train SVM model with best config
         # # generator for SVM
