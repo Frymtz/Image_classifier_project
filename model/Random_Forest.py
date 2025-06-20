@@ -41,9 +41,7 @@ class RandomForestModel:
             best_params['n_jobs'] = -1 
             self.model = RandomForestClassifier(**best_params)
             self.model.fit(X_train, y_train)
-            print(f"F1 SCORE: ",best_f1_score)
             return best_f1_score
-            
         else:
             self.model.fit(X_train, y_train)
 

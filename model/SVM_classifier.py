@@ -3,6 +3,7 @@ import optuna
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 class SVMModel:
     def __init__(self, C=1.0, kernel='rbf', random_state=None):
@@ -21,6 +22,7 @@ class SVMModel:
                     'kernel': trial.suggest_categorical('kernel', ['linear', 'rbf', 'poly']),
                     'gamma': trial.suggest_float('gamma', 1e-4, 1e1, log=True),
                     'degree': trial.suggest_int('degree', 2, 5),  # Only used for poly kernel
+                    'coef0': trial.suggest_float('coef0', 0.0, 1.0),
                     'class_weight': class_weight_dict,
                     'random_state': 42,
                     'probability': True  # Needed for ROC-AUC
@@ -31,10 +33,9 @@ class SVMModel:
                     params.pop('degree')
                 
                 model = SVC(**params)
-                model.fit(X_train, y_train)
-                preds = model.predict(X_val)
-                score = f1_score(y_val, preds, average='weighted')
-                return score
+                cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+                scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='f1_weighted')
+                return scores.mean()
 
             study = optuna.create_study(direction='maximize')
             study.optimize(objective, n_trials=n_trials)
@@ -43,7 +44,7 @@ class SVMModel:
             best_params['class_weight'] = class_weight_dict
             best_params['random_state'] = 42
             best_params['probability'] = True  # Ensure this is set
-            
+
             self.model = SVC(**best_params)
             self.model.fit(X_train, y_train)
             print(f"Optimized F1 Score: {best_f1_score:.4f}")
