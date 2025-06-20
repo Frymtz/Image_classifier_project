@@ -171,11 +171,12 @@ def main(args):
         ]
 
         extraction_options = [
-            ["raw"], ["fos"] 
+            ["raw"], ["hog"] 
         ]
 
-        # resize_options = [height_width, None]
+        resize_options = [height_width, None]
         resize_options = [height_width]
+
         best_f1_rf = -1
         best_f1_knn = -1
         best_f1_svm = -1
@@ -199,9 +200,9 @@ def main(args):
                         X_test, y_test 
                     ) = process(generator, output_path, False)
 
-                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="rf", fit_trials=5)  
-                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="knn", fit_trials=5)
-                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="svm", fit_trials=5)
+                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="rf", fit_trials=50)  
+                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="knn", fit_trials=50)
+                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="svm", fit_trials=50)
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: RANDOM FOREST: {f1_rf}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: KNN: {f1_knn}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: SVM: {f1_svm}")     
@@ -222,9 +223,8 @@ def main(args):
         log.info(f"Random Forest - Technique: {best_config['rf']['technique']} | Resize: {best_config['rf']['resize']} | F1-score: {best_f1_rf}")
         log.info(f"KNN - Technique: {best_config['knn']['technique']} | Resize: {best_config['knn']['resize']} | F1-score: {best_f1_knn}")
         log.info(f"SVM - Technique: {best_config['svm']['technique']} | Resize: {best_config['svm']['resize']} | F1-score: {best_f1_svm}")
-        exit(-1)
-        # Final training with best config
 
+        # Final training with best config
         # Train the Random Forest model with the best configuration
         log.info("Training Random Forest model with best configuration...")
         generator = create_generator(
@@ -234,10 +234,15 @@ def main(args):
         )
         output_path = None
 
-        _, rf_model, X_test, y_test = train_with_data(generator, output_path, False, model="rf", fit_trials=50, return_test=True)
+        (   X_train, y_train,
+            X_val, y_val,
+            X_test, y_test 
+        ) = process(generator, output_path, False)
+
+        _, rf_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="rf", fit_trials=100)
         
         knn_model = None
-        # svm_model = None
+        svm_model = None
 
         # Train KNN model with best config
         log.info("Training KNN model with best configuration...")
@@ -246,7 +251,13 @@ def main(args):
             validation_label_path, validation_percent,
             test_label_path, test_percent, best_config['knn']['resize'], best_config['knn']['technique']
         )
-        _, knn_model, _, _ = train_with_data(generator_knn, output_path, False, model="knn", fit_trials=50, return_test=True)
+        
+        (   X_train, y_train,
+            X_val, y_val,
+            X_test, y_test 
+        ) = process(generator_knn, output_path, False)
+
+        _, knn_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="knn", fit_trials=100)
 
         # Train SVM model with best config
         # generator for SVM
@@ -256,12 +267,18 @@ def main(args):
             validation_label_path, validation_percent,
             test_label_path, test_percent, best_config['svm']['resize'], best_config['svm']['technique']
         )
-        _, svm_model, _, _ = train_with_data(generator_svm, output_path, False, model="svm", fit_trials=50, return_test=True)
+        (   X_train, y_train,
+            X_val, y_val,
+            X_test, y_test 
+        ) = process(generator_svm, output_path, False)
+        _, svm_model = train_with_data(X_train, y_train, X_val, y_val, X_test, y_test, model="svm", fit_trials=100)
 
 
         log.info("Final Random Forest, KNN and SVM model trained with best configuration.")
         # UNCOMMENT ONLY IF YOU ALREADY HAVE THE BEST MODEL AND PRE-PROCESSED DATA
-        # ensemble = HardVotingEnsemble([rf_model, knn_model, svm_model])
+        ensemble = HardVotingEnsemble([rf_model, knn_model, svm_model])
+        print(ensemble)
+
         # ensemble_f1 = ensemble.score(X_test, y_test)
         # log.info(f"Ensemble Metrics - F1-score: {ensemble_f1.get('f1')}, Accuracy: {ensemble_f1.get('accuracy')}, Precision: {ensemble_f1.get('precision')}, Recall: {ensemble_f1.get('recall')}")
 

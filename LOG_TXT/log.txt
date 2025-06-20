@@ -8,3 +8,53 @@
 2025-06-19 23:03:18,260 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: KNN: 0.8962970362970364
 2025-06-19 23:03:18,260 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: SVM: 0.8962970362970364
 2025-06-19 23:03:18,262 [INFO] Processing extraction technique: ['fos'] with resize: [24, 24]
+2025-06-19 23:19:09,089 [INFO] Stating the program...
+2025-06-19 23:19:09,090 [INFO] Verifying all arguments...
+2025-06-19 23:19:10,294 [INFO] Deleted and recreated 'C:\Users\Fritz\Documents\UFPA_8S\IC\Project_1_clean\Processed_images'.
+2025-06-19 23:19:11,187 [INFO] All arguments verified successfully.
+2025-06-19 23:19:11,187 [INFO] Processing extraction technique: ['raw'] with resize: [24, 24]
+2025-06-19 23:19:25,567 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: RANDOM FOREST: 0.8880093532038739
+2025-06-19 23:19:25,567 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: KNN: 0.8962970362970364
+2025-06-19 23:19:25,567 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: SVM: 0.7121212121212122
+2025-06-19 23:19:25,567 [INFO] Processing extraction technique: ['hog'] with resize: [24, 24]
+2025-06-19 23:19:51,134 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: RANDOM FOREST: 0.8962970362970364
+2025-06-19 23:19:51,134 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: KNN: 0.8624888888888889
+2025-06-19 23:19:51,134 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: SVM: 0.7121212121212122
+2025-06-19 23:19:51,134 [INFO] Random Forest - Technique: ['hog'] | Resize: [24, 24] | F1-score: 0.8962970362970364
+2025-06-19 23:19:51,134 [INFO] KNN - Technique: ['raw'] | Resize: [24, 24] | F1-score: 0.8962970362970364
+2025-06-19 23:19:51,137 [INFO] SVM - Technique: ['raw'] | Resize: [24, 24] | F1-score: 0.7121212121212122
+2025-06-19 23:21:51,953 [INFO] Stating the program...
+2025-06-19 23:21:51,953 [INFO] Verifying all arguments...
+2025-06-19 23:21:53,976 [INFO] Deleted and recreated 'C:\Users\Fritz\Documents\UFPA_8S\IC\Project_1_clean\Processed_images'.
+2025-06-19 23:21:54,393 [INFO] All arguments verified successfully.
+2025-06-19 23:21:54,395 [INFO] Processing extraction technique: ['raw'] with resize: [24, 24]
+2025-06-19 23:22:03,488 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: RANDOM FOREST: 0.8589864790786701
+2025-06-19 23:22:03,488 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: KNN: 0.8962970362970364
+2025-06-19 23:22:03,489 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: SVM: 0.8808044963127877
+2025-06-19 23:22:03,489 [INFO] Processing extraction technique: ['hog'] with resize: [24, 24]
+2025-06-19 23:22:26,536 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: RANDOM FOREST: 0.8962970362970364
+2025-06-19 23:22:26,536 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: KNN: 0.8962970362970364
+2025-06-19 23:22:26,536 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: SVM: 0.6499618519645033
+2025-06-19 23:22:26,536 [INFO] Random Forest - Technique: ['hog'] | Resize: [24, 24] | F1-score: 0.8962970362970364
+2025-06-19 23:22:26,536 [INFO] KNN - Technique: ['raw'] | Resize: [24, 24] | F1-score: 0.8962970362970364
+2025-06-19 23:22:26,536 [INFO] SVM - Technique: ['raw'] | Resize: [24, 24] | F1-score: 0.8808044963127877
+2025-06-19 23:22:26,536 [INFO] Training Random Forest model with best configuration...
+2025-06-19 23:31:44,704 [INFO] Stating the program...
+2025-06-19 23:31:44,704 [INFO] Verifying all arguments...
+2025-06-19 23:31:47,329 [INFO] Deleted and recreated 'C:\Users\Fritz\Documents\UFPA_8S\IC\Project_1_clean\Processed_images'.
+2025-06-19 23:31:47,921 [INFO] All arguments verified successfully.
+2025-06-19 23:31:47,921 [INFO] Processing extraction technique: ['raw'] with resize: [24, 24]
+2025-06-19 23:31:56,451 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: RANDOM FOREST: 0.8581489365372071
+2025-06-19 23:31:56,451 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: KNN: 0.8962970362970364
+2025-06-19 23:31:56,451 [INFO] F1-score for ['raw'] | Resize: [24, 24] | Model: SVM: 0.8851208344647421
+2025-06-19 23:31:56,454 [INFO] Processing extraction technique: ['hog'] with resize: [24, 24]
+2025-06-19 23:32:14,867 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: RANDOM FOREST: 0.8962970362970364
+2025-06-19 23:32:14,867 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: KNN: 0.8962970362970364
+2025-06-19 23:32:14,867 [INFO] F1-score for ['hog'] | Resize: [24, 24] | Model: SVM: 0.782077497665733
+2025-06-19 23:32:14,868 [INFO] Random Forest - Technique: ['hog'] | Resize: [24, 24] | F1-score: 0.8962970362970364
+2025-06-19 23:32:14,868 [INFO] KNN - Technique: ['raw'] | Resize: [24, 24] | F1-score: 0.8962970362970364
+2025-06-19 23:32:14,868 [INFO] SVM - Technique: ['raw'] | Resize: [24, 24] | F1-score: 0.8851208344647421
+2025-06-19 23:32:14,868 [INFO] Training Random Forest model with best configuration...
+2025-06-19 23:32:24,926 [INFO] Training KNN model with best configuration...
+2025-06-19 23:32:30,673 [INFO] Training SVM model with best configuration...
+2025-06-19 23:32:35,449 [INFO] Final Random Forest, KNN and SVM model trained with best configuration.
