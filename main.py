@@ -79,31 +79,31 @@ def main(args):
             if model[0].lower() == "rf" or model[0].lower() == "all":
                 log.info("Training Random Forest model...")
                 rf_model = RandomForestModel()
-                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 rf_model.score(X_test, y_test)
                 log.info("Random Forest model evaluation completed successfully.")
 
             if model[0].lower() == "knn" or model[0].lower() == "all":   
                 log.info("Training KNN model...")
                 knn_model = KNNModel()
-                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 knn_model.score(X_test, y_test)
                 log.info("KNN model evaluation completed successfully.")
 
             if model[0].lower() == "svm" or model[0].lower() == "all":
                 log.info("Training SVM model...")
                 svm_model = SVMModel()
-                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 svm_model.score(X_test, y_test)
                 log.info("SVM model evaluation completed successfully.")
 
             if model[0].lower() == "ensemble" or model[0].lower() == "all":
                 rf_model = RandomForestModel()
-                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 knn_model = KNNModel()
-                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 svm_model = SVMModel()
-                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 ensemble = SHVotingEnsemble([rf_model, knn_model, svm_model], mode="default")
                 
                 ensemble.fit(X_train, y_train)
@@ -122,12 +122,7 @@ def main(args):
             ["correlogram"], ["amfm"], ["dwt"], ["swt"], ["wp"], ["gt"], ["zernikes"], ["hu"], ["tas"], ["hog"]
         ]
 
-        extraction_options = [
-            ["raw"] 
-        ]
-
         resize_options = [height_width, None]
-        resize_options = [height_width]
 
         best_f1_rf = -1
         best_f1_knn = -1
@@ -152,9 +147,9 @@ def main(args):
                         X_test, y_test 
                     ) = process(generator, output_path, False)
 
-                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=1)  
-                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=1)
-                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=1)
+                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=100)  
+                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=100)
+                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=100)
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: RANDOM FOREST: {f1_rf}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: KNN: {f1_knn}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: SVM: {f1_svm}")     
@@ -191,7 +186,7 @@ def main(args):
             X_test_rf, y_test 
         ) = process(generator, output_path, False)
 
-        _, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=1)
+        _, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=100)
         
         knn_model = None
         svm_model = None
@@ -209,7 +204,7 @@ def main(args):
             X_test_knn, y_test 
         ) = process(generator_knn, output_path, False)
 
-        _, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=1)
+        _, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=100)
 
         # Train SVM model with best config
         # generator for SVM
@@ -223,26 +218,17 @@ def main(args):
             X_val, y_val,
             X_test_svm, y_test 
         ) = process(generator_svm, output_path, False)
-        _, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=1)
+        _, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=100)
 
 
         log.info("Final Random Forest, KNN and SVM model trained with best configuration.")
-
-        ensemble = SHVotingEnsemble([rf_model, knn_model, svm_model], mode="default")
-
-        #X_test = [X_test_rf, X_test_knn, X_test_svm]
-        ensemble_f1 = ensemble.score(X_val, y_val)
-        log.info(
-            "Ensemble Metrics:\n"
-            f"  F1-score : {ensemble_f1.get('f1')}\n"
-            f"  Accuracy : {ensemble_f1.get('accuracy')}\n"
-            f"  Precision: {ensemble_f1.get('precision')}\n"
-            f"  Recall   : {ensemble_f1.get('recall')}\n"
-            f"  ROC AUC  : {ensemble_f1.get('roc_auc')}\n"
-            f"  Confusion Matrix:\n{ensemble_f1.get('confusion_matrix')}\n"
-        )
         
-
-    
+        ensemble = SHVotingEnsemble([rf_model, knn_model, svm_model], mode="multi_inputs")        
+        ensemble.fit(X_train, y_train)
+        
+        X_test = [X_test_rf, X_test_knn, X_test_svm]
+        ensemble.score(X_test, y_test)
+        log.info("Ensemble model evaluation completed successfully.")
+    log.info("Program completed successfully. :)")
 if __name__ == "__main__":
     main()
