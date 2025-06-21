@@ -26,52 +26,46 @@ if __name__ == "__main__":
         '-et', '--extract_technique',
         nargs='+',
         choices=[
-            'hog', 'lbp', 'sift', 'surf', 'orb', 'gabor', 'haralick', 'color_hist',
-            'glcm', 'fos', 'glds', 'ngtdm', 'sfm', 'lte', 'fdta', 'glrlm', 'fps',
-            'shape', 'glszm', 'hos', 'grayscale_morphology', 'multilevel_binary_morphology',
-            'histogram', 'multiregion_histogram', 'correlogram', 'amfm', 'dwt', 'swt',
-            'wp', 'gt', 'zernikes', 'hu', 'tas', 'best_feature'
+            'raw', 'fos', 'glcm', 'glds', 'ngtdm', 'sfm', 'lte', 'fdta',
+            'glrlm', 'fps', 'shape', 'glszm', 'hos', 'lbp', 'grayscale_morphology',
+            'multilevel_binary_morphology', 'histogram', 'multiregion_histogram',
+            'correlogram', 'amfm', 'dwt', 'swt', 'wp', 'gt', 'zernikes', 'hu', 'tas', 'hog', 'best_feature'
         ],
         help=(
             "Feature extraction techniques:\n"
-            "hog (Histogram of Oriented Gradients), "
-            "lbp (Local Binary Patterns), "
-            "sift (Scale-Invariant Feature Transform), "
-            "surf (Speeded-Up Robust Features), "
-            "orb (Oriented FAST and Rotated BRIEF), "
-            "gabor (Gabor filters), "
-            "haralick (Haralick texture features), "
-            "color_hist (Color histogram), "
-            "glcm (Gray Level Co-occurrence Matrix), "
-            "fos (First Order Statistics), "
-            "glds (Gray Level Difference Statistics), "
-            "ngtdm (Neighborhood Gray Tone Difference Matrix), "
-            "sfm (Statistical Feature Matrix), "
-            "lte (Law's Texture Energy Measures), "
-            "fdta (Fractal Dimension Texture Analysis), "
-            "glrlm (Gray Level Run Length Matrix), "
-            "fps (Fourier Power Spectrum), "
-            "shape (Shape Parameters), "
-            "glszm (Gray Level Size Zone Matrix), "
-            "hos (Higher Order Spectra), "
-            "grayscale_morphology (Gray-scale Morphological Analysis), "
-            "multilevel_binary_morphology (Multilevel Binary Morphological Analysis), "
-            "histogram (Histogram), "
-            "multiregion_histogram (Multi-region histogram), "
-            "correlogram (Correlogram), "
-            "amfm (Amplitude Modulation – Frequency Modulation), "
-            "dwt (Discrete Wavelet Transform), "
-            "swt (Stationary Wavelet Transform), "
-            "wp (Wavelet Packets), "
-            "gt (Gabor Transform), "
-            "zernikes (Zernikes’ Moments), "
-            "hu (Hu’s Moments), "
-            "tas (Threshold Adjacency Matrix),"
-            "best_feature (Best Feature Selection Automatically)"
+            "raw: Raw pixel values; "
+            "fos: First-order statistics; "
+            "glcm: Gray Level Co-occurrence Matrix; "
+            "glds: Gray Level Difference Statistics; "
+            "ngtdm: Neighborhood Gray Tone Difference Matrix; "
+            "sfm: Statistical Feature Matrix; "
+            "lte: Local Ternary Patterns; "
+            "fdta: Fractal Dimension Texture Analysis; "
+            "glrlm: Gray Level Run Length Matrix; "
+            "fps: Fourier Power Spectrum; "
+            "shape: Shape features; "
+            "glszm: Gray Level Size Zone Matrix; "
+            "hos: Higher Order Statistics; "
+            "lbp: Local Binary Patterns; "
+            "grayscale_morphology: Grayscale morphological features; "
+            "multilevel_binary_morphology: Multilevel binary morphological features; "
+            "histogram: Histogram features; "
+            "multiregion_histogram: Multi-region histogram features; "
+            "correlogram: Color/texture correlogram; "
+            "amfm: Adaptive Multi-scale Filter Moments; "
+            "dwt: Discrete Wavelet Transform; "
+            "swt: Stationary Wavelet Transform; "
+            "wp: Wavelet Packet; "
+            "gt: Gabor Transform; "
+            "zernikes: Zernike moments; "
+            "hu: Hu moments; "
+            "tas: Texture Analysis Statistics; "
+            "hog: Histogram of Oriented Gradients; "
+            "best_feature: Automatically selected best features."
         )
     )
     group_models = parser.add_argument_group('Model Parameters')
-    group_models.add_argument('--model', choices=['rf', 'knn', 'svm', 'ensemble'], nargs='+',
+    group_models.add_argument('--model', choices=['rf', 'knn', 'svm', 'ensemble', 'all'], nargs='+',
                              help="Choose model(s): rf, knn, svm, ensemble")
 
     args = parser.parse_args()

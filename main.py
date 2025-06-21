@@ -1,61 +1,9 @@
 import os
-from re import X
 from utils import Logger
 from utils import checks as ch
-from dataset import ImageDatasetGenerator
-from model import  RandomForestModel, HardVotingEnsemble, KNNModel, SVMModel 
+from model import  RandomForestModel, SHVotingEnsemble, KNNModel, SVMModel 
+from utils import flatten_features, process, create_generator, train_with_data
 
-
-def create_generator(args, extention, train_label_path, train_percent, validation_label_path, validation_percent,
-                    test_label_path, test_percent, height_width, extraction_technique):
-    
-    return ImageDatasetGenerator(
-        train_data_path=args.train[0],
-        extension=extention,
-        train_label_path=train_label_path,
-        train_percent=train_percent,
-        validation_data_path=args.validation[0],
-        validation_label_path=validation_label_path,
-        validation_percent=validation_percent,
-        test_data_path=args.test[0],
-        test_label_path=test_label_path,
-        test_percent=test_percent,
-        height_width=height_width,
-        extraction_technique=extraction_technique
-    )
-
-def flatten_features(X):
-    if X is None:
-        return None
-    if len(X.shape) > 2:
-        return X.reshape((X.shape[0], -1))
-    return X
-
-def process(generator, output_path, create_hdf5):
-    X_train, X_val, X_test, y_train, y_val, y_test = generator.generate_hdf5(
-        output_path=output_path, create_hdf5=create_hdf5
-    )
-
-    X_train = flatten_features(X_train)
-    X_val = flatten_features(X_val)
-    X_test = flatten_features(X_test)
-
-    return X_train, y_train, X_val, y_val, X_test, y_test
-
-def train_with_data(X_train, y_train, X_val, y_val, model, fit_trials=50):
-    model_map = {
-        "rf": RandomForestModel,
-        "knn": KNNModel,
-        "svm": SVMModel,
-    }
-
-    model_key = model.lower()
-    model_instance = model_map[model_key]() if callable(model_map[model_key]) else model_map[model_key]()
-    f1 = model_instance.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=fit_trials)
-
-    return f1, model_instance
-
-    
 def main(args):
     log = Logger(name="main", level=10)
     log.info("Stating the program...")
@@ -131,33 +79,36 @@ def main(args):
             if model[0].lower() == "rf" or model[0].lower() == "all":
                 log.info("Training Random Forest model...")
                 rf_model = RandomForestModel()
-                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
-                metrics = rf_model.score(X_val, y_val)
-                log.info(f"Random Forest Metrics - F1-score: {metrics.get('f1')}, Accuracy: {metrics.get('accuracy')}, Precision: {metrics.get('precision')}, Recall: {metrics.get('recall')}")
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                rf_model.score(X_test, y_test)
+                log.info("Random Forest model evaluation completed successfully.")
 
-            elif model[0].lower() == "knn" or model[0].lower() == "all":   
+            if model[0].lower() == "knn" or model[0].lower() == "all":   
                 log.info("Training KNN model...")
                 knn_model = KNNModel()
-                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
-                metrics = knn_model.score(X_val, y_val)
-                log.info(f"KNN Metrics - F1-score: {metrics.get('f1')}, Accuracy: {metrics.get('accuracy')}, Precision: {metrics.get('precision')}, Recall: {metrics.get('recall')}")
-  
-            elif model[0].lower() == "svm" or model[0].lower() == "all":
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                knn_model.score(X_test, y_test)
+                log.info("KNN model evaluation completed successfully.")
+
+            if model[0].lower() == "svm" or model[0].lower() == "all":
                 log.info("Training SVM model...")
                 svm_model = SVMModel()
-                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
-                metrics = svm_model.score(X_val, y_val)
-                log.info(f"SVM F1-score: {metrics['f1']}, Accuracy: {metrics.get('accuracy')}, Precision: {metrics.get('precision')}, Recall: {metrics.get('recall')}")
-            elif model[0].lower() == "ensemble" or model[0].lower() == "all":
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                svm_model.score(X_test, y_test)
+                log.info("SVM model evaluation completed successfully.")
+
+            if model[0].lower() == "ensemble" or model[0].lower() == "all":
                 rf_model = RandomForestModel()
-                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
                 knn_model = KNNModel()
-                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
                 svm_model = SVMModel()
-                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
-                ensemble = HardVotingEnsemble([rf_model, knn_model, svm_model], mode="single_processing")
-                ensemble_f1 = ensemble.score(X_val, y_val)
-                log.info(f"Ensemble Metrics - F1-score: {ensemble_f1.get('f1')}, Accuracy: {ensemble_f1.get('accuracy')}, Precision: {ensemble_f1.get('precision')}, Recall: {ensemble_f1.get('recall')}")
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                ensemble = SHVotingEnsemble([rf_model, knn_model, svm_model], mode="default")
+                
+                ensemble.fit(X_train, y_train)
+                ensemble.score(X_test, y_test)
+                log.info("Ensemble model evaluation completed successfully.")
 
         except Exception as e:
             log.error(f"Failed to load data or train model: {e}")
@@ -172,7 +123,7 @@ def main(args):
         ]
 
         extraction_options = [
-            ["raw"], ["hog"] 
+            ["raw"] 
         ]
 
         resize_options = [height_width, None]
@@ -201,9 +152,9 @@ def main(args):
                         X_test, y_test 
                     ) = process(generator, output_path, False)
 
-                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=50)  
-                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=50)
-                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=50)
+                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=1)  
+                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=1)
+                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=1)
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: RANDOM FOREST: {f1_rf}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: KNN: {f1_knn}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: SVM: {f1_svm}")     
@@ -240,7 +191,7 @@ def main(args):
             X_test_rf, y_test 
         ) = process(generator, output_path, False)
 
-        _, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=100)
+        _, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=1)
         
         knn_model = None
         svm_model = None
@@ -258,7 +209,7 @@ def main(args):
             X_test_knn, y_test 
         ) = process(generator_knn, output_path, False)
 
-        _, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=100)
+        _, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=1)
 
         # Train SVM model with best config
         # generator for SVM
@@ -272,17 +223,26 @@ def main(args):
             X_val, y_val,
             X_test_svm, y_test 
         ) = process(generator_svm, output_path, False)
-        _, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=100)
+        _, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=1)
 
 
         log.info("Final Random Forest, KNN and SVM model trained with best configuration.")
-        ensemble = HardVotingEnsemble([rf_model, knn_model, svm_model], mode="mult_processing")
 
-        X_test = [X_test_rf, X_test_knn, X_test_svm]
+        ensemble = SHVotingEnsemble([rf_model, knn_model, svm_model], mode="default")
 
-        ensemble_f1 = ensemble.score(X_test, y_test)
-        log.info(f"Ensemble Metrics - F1-score: {ensemble_f1.get('f1')}, Accuracy: {ensemble_f1.get('accuracy')}, Precision: {ensemble_f1.get('precision')}, Recall: {ensemble_f1.get('recall')}")
+        #X_test = [X_test_rf, X_test_knn, X_test_svm]
+        ensemble_f1 = ensemble.score(X_val, y_val)
+        log.info(
+            "Ensemble Metrics:\n"
+            f"  F1-score : {ensemble_f1.get('f1')}\n"
+            f"  Accuracy : {ensemble_f1.get('accuracy')}\n"
+            f"  Precision: {ensemble_f1.get('precision')}\n"
+            f"  Recall   : {ensemble_f1.get('recall')}\n"
+            f"  ROC AUC  : {ensemble_f1.get('roc_auc')}\n"
+            f"  Confusion Matrix:\n{ensemble_f1.get('confusion_matrix')}\n"
+        )
+        
 
-
+    
 if __name__ == "__main__":
     main()

@@ -167,7 +167,7 @@ def check_model(model, error_message):
         list: Validated model types.
     """
     valid_models = {
-        "svm", "rf", "knn", "ensemble"
+        "svm", "rf", "knn", "ensemble", "all"
     }
     if isinstance(model, str):
         model = [model]

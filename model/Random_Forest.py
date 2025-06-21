@@ -2,14 +2,14 @@ from sklearn.ensemble import RandomForestClassifier
 import optuna
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
-from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
 from sklearn.model_selection import cross_val_score, StratifiedKFold
+from utils.results import ModelEvaluator
 
 class RandomForestModel:
     def __init__(self, n_estimators=100, random_state=None):
         self.model = RandomForestClassifier(n_estimators=n_estimators, random_state=random_state)
 
-    def fit(self, X_train, y_train, X_val=None, y_val=None, use_optuna=False, n_trials=50):
+    def fit(self, X_train, y_train, X_val=None, y_val=None, use_optuna=False, n_trials=100):
         if use_optuna and X_val is not None and y_val is not None:
 
             # Compute class weights for imbalanced data
@@ -29,7 +29,7 @@ class RandomForestModel:
                 }
                 model = RandomForestClassifier(**params)
                 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-                scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='f1_weighted')
+                scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='f1_macro')
                 return scores.mean()
 
             study = optuna.create_study(direction='maximize')
@@ -47,26 +47,10 @@ class RandomForestModel:
 
     def predict(self, X_test):
         return self.model.predict(X_test)
+    
+    def predict_proba(self, X_test):
+        return self.model.predict_proba(X_test)
 
     def score(self, X_test, y_test):
-        y_pred = self.model.predict(X_test)
-        precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
-        recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
-        f1 = f1_score(y_test, y_pred, average='weighted', zero_division=0)
-        cm = confusion_matrix(y_test, y_pred)
-        # ROC-AUC: only for binary or multilabel-indicator, handle multiclass with 'ovr'
-        try:
-            if hasattr(self.model, "predict_proba"):
-                y_score = self.model.predict_proba(X_test)
-                roc_auc = roc_auc_score(y_test, y_score, multi_class='ovr', average='weighted')
-            else:
-                roc_auc = None
-        except Exception:
-            roc_auc = None
-        return {
-            'precision': precision,
-            'recall': recall,
-            'f1_score': f1,
-            'confusion_matrix': cm,
-            'roc_auc': roc_auc
-        }
+        evaluator = ModelEvaluator(self.model, "RandomForest")
+        evaluator.evaluate(X_test, y_test)
