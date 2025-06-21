@@ -1,5 +1,6 @@
 from dataset import ImageDatasetGenerator
-from model import  RandomForestModel, SHVotingEnsemble, KNNModel, SVMModel
+from model import  RandomForestModel, KNNModel, SVMModel
+from utils.augmentation import Augmentation as Aug
 
 def create_generator(args, extention, train_label_path, train_percent, validation_label_path, validation_percent,
                     test_label_path, test_percent, height_width, extraction_technique):
@@ -30,6 +31,9 @@ def process(generator, output_path, create_hdf5):
     X_train, X_val, X_test, y_train, y_val, y_test = generator.generate_hdf5(
         output_path=output_path, create_hdf5=create_hdf5
     )
+
+    augmenter = Aug(random_state=42)
+    X_train, y_train = augmenter.balance_oversample(X_train, y_train)
 
     X_train = flatten_features(X_train)
     X_val = flatten_features(X_val)

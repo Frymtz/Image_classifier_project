@@ -1,4 +1,6 @@
 import logging
+from datetime import datetime
+import os
 
 class Logger:
     """
@@ -24,23 +26,27 @@ class Logger:
             file_handler = logging.FileHandler('LOG_TXT/log.txt', encoding='utf-8')
             file_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
             file_handler.setFormatter(file_formatter)
+            # Write header with date and time at the start of the log file
+            log_file_path = 'LOG_TXT/log.txt'
+            if not os.path.exists('LOG_TXT'):
+                os.makedirs('LOG_TXT')
+            # Overwrite file if it's the first logger instance in this run
+            if not os.path.exists(log_file_path) or os.path.getsize(log_file_path) == 0:
+                with open(log_file_path, 'w', encoding='utf-8') as f:
+                    f.write(f"===== Log started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====\n")
+            file_handler = logging.FileHandler(log_file_path, encoding='utf-8')
+            file_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+            file_handler.setFormatter(file_formatter)
             self.logger.addHandler(file_handler)
 
         self.logger.setLevel(level)
         self.logger.propagate = False  
 
     def info(self, msg, *args, **kwargs):
-        """Loga uma mensagem de informação."""
+        """Logs an info message."""
         self.logger.info(msg, *args, **kwargs)
 
-    def warning(self, msg, *args, **kwargs):
-        """Loga uma mensagem de aviso."""
-        self.logger.warning(msg, *args, **kwargs)
-
     def error(self, msg, *args, **kwargs):
-        """Loga uma mensagem de erro."""
+        """Logs an error message."""
         self.logger.error(msg, *args, **kwargs)
 
-    def debug(self, msg, *args, **kwargs):
-        """Loga uma mensagem de depuração."""
-        self.logger.debug(msg, *args, **kwargs)

@@ -1,8 +1,9 @@
 import os
 from utils import Logger
 from utils import checks as ch
-from model import  RandomForestModel, SHVotingEnsemble, KNNModel, SVMModel 
+from model import RandomForestModel, SHVotingEnsemble, KNNModel, SVMModel 
 from utils import flatten_features, process, create_generator, train_with_data
+from utils import Augmentation as Aug
 
 def main(args):
     log = Logger(name="main", level=10)
@@ -68,6 +69,10 @@ def main(args):
             y_train = data['train_label']
             X_val = data['validation_data']
             y_val = data['validation_label']
+
+            augmenter = Aug(random_state=42)
+            X_train, y_train = augmenter.balance_oversample(X_train, y_train)
+            
             X_train = flatten_features(X_train)
             X_val = flatten_features(X_val)
 
@@ -121,8 +126,13 @@ def main(args):
             ["multilevel_binary_morphology"], ["histogram"], ["multiregion_histogram"],
             ["correlogram"], ["amfm"], ["dwt"], ["swt"], ["wp"], ["gt"], ["zernikes"], ["hu"], ["tas"], ["hog"]
         ]
+        # extraction_options = [
+        #     ["raw"]
+        
+        # ]
 
         resize_options = [height_width, None]
+        # resize_options = [height_width]
 
         best_f1_rf = -1
         best_f1_knn = -1
@@ -218,13 +228,13 @@ def main(args):
             X_val, y_val,
             X_test_svm, y_test 
         ) = process(generator_svm, output_path, False)
+                
         _, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=100)
-
 
         log.info("Final Random Forest, KNN and SVM model trained with best configuration.")
         
         ensemble = SHVotingEnsemble([rf_model, knn_model, svm_model], mode="multi_inputs")        
-        ensemble.fit(X_train, y_train)
+        ensemble.fit(X_train, y_train) #All models are already trained, so we just fit the ensemble for ROC AUC evaluation.
         
         X_test = [X_test_rf, X_test_knn, X_test_svm]
         ensemble.score(X_test, y_test)
