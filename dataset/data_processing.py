@@ -7,6 +7,8 @@ from PIL import Image
 import h5py
 from tqdm import tqdm
 from utils import ImageFeatureExtractor
+from utils.augmentation import Augmentation
+
 
 class ImageDatasetGenerator:
     def __init__(
@@ -68,26 +70,45 @@ class ImageDatasetGenerator:
             images.append(features)
         return np.stack(images)
 
+    def _load_images_raw(self, paths: List[str], base_dir: Optional[str] = None) -> np.ndarray:
+        images = []
+        for path in tqdm(paths, desc="[INFO] Loading raw images"):
+            img_path = os.path.join(base_dir, path) if base_dir else path
+            img = Image.open(img_path).convert('L') # Convert to grayscale
+            images.append(np.array(img))
+        return np.stack(images)
+
     def generate_hdf5(self, output_path: str, create_hdf5: bool, train_img_dir=None, val_img_dir=None, test_img_dir=None):
-        # Use the provided directory or default to the data path attributes
         train_img_dir = train_img_dir if train_img_dir is not None else self.train_data_path
         val_img_dir = val_img_dir if val_img_dir is not None else self.validation_data_path
         test_img_dir = test_img_dir if test_img_dir is not None else self.test_data_path
 
-        train_data = self._load_images_processImages(self.train_df['image'].tolist(), train_img_dir)
+        
+        X_train_raw = self._load_images_raw(self.train_df['image'].tolist(), train_img_dir)
+        y_train = np.array(self.train_df['MEL'].tolist())
+
+        augmenter = Augmentation(random_state=42)
+        X_train_bal, y_train_bal = augmenter.balance_oversample(X_train_raw, y_train)
+
+        extractor = ImageFeatureExtractor(self.height_width)
+        extraction_technique = None if not self.extraction_technique else self.extraction_technique[0].lower()
+        train_data = []
+        for img in tqdm(X_train_bal, desc="[INFO] Extracting features from balanced train set"):
+            features = extractor.extract(Image.fromarray(img), extraction_technique)
+            train_data.append(features)
+        train_data = np.stack(train_data)
+
         val_data = self._load_images_processImages(self.validation_df['image'].tolist(), val_img_dir)
         test_data = self._load_images_processImages(self.test_df['image'].tolist(), test_img_dir)
-        
-        if not create_hdf5:
-            train_labels = np.array(self.train_df['MEL'].tolist())
-            val_labels = np.array(self.validation_df['MEL'].tolist())
-            test_labels = np.array(self.test_df['MEL'].tolist())
+        val_labels = np.array(self.validation_df['MEL'].tolist())
+        test_labels = np.array(self.test_df['MEL'].tolist())
 
-            return train_data, val_data, test_data, train_labels, val_labels, test_labels 
-           
+        if not create_hdf5:
+            return train_data, val_data, test_data, y_train_bal, val_labels, test_labels
+
         with h5py.File(output_path, 'w') as f:
             f.create_dataset('train_data', data=train_data, compression="gzip")
-            f.create_dataset('train_label', data=np.array(self.train_df['MEL'].tolist()), compression="gzip")
+            f.create_dataset('train_label', data=y_train_bal, compression="gzip")
             f.create_dataset('validation_data', data=val_data, compression="gzip")
             f.create_dataset('validation_label', data=np.array(self.validation_df['MEL'].tolist()), compression="gzip")
             f.create_dataset('test_data', data=test_data, compression="gzip")

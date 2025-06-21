@@ -3,7 +3,7 @@ from utils import Logger
 from utils import checks as ch
 from model import RandomForestModel, SHVotingEnsemble, KNNModel, SVMModel 
 from utils import flatten_features, process, create_generator, train_with_data
-from utils import Augmentation as Aug
+
 
 def main(args):
     log = Logger(name="main", level=10)
@@ -62,20 +62,12 @@ def main(args):
 #---------------------------------------------------------------------------------------------#
     # Classification Model
     if ext_tech != "best_feature":
-        log.info("Starting Random Forest model training...")
         try:
             data = generator.load_hdf5(output_path)
-            X_train = data['train_data']
+            X_train = flatten_features(data['train_data'])
             y_train = data['train_label']
-            X_val = data['validation_data']
+            X_val = flatten_features(data['validation_data'])
             y_val = data['validation_label']
-
-            augmenter = Aug(random_state=42)
-            X_train, y_train = augmenter.balance_oversample(X_train, y_train)
-            
-            X_train = flatten_features(X_train)
-            X_val = flatten_features(X_val)
-
             X_test = data['test_data']
             X_test = flatten_features(data['test_data'])
             y_test = data['test_label']
@@ -84,7 +76,7 @@ def main(args):
             if model[0].lower() == "rf" or model[0].lower() == "all":
                 log.info("Training Random Forest model...")
                 rf_model = RandomForestModel()
-                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
                 rf_model.score(X_test, y_test)
                 log.info("Random Forest model evaluation completed successfully.")
 
