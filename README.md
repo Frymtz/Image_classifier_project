@@ -99,6 +99,30 @@ The combination of these techniques ensures that the model is trained robustly, 
 - **Comprehensive Logging**:  
     The pipeline features robust logging of all key activities and events throughout execution. This includes validation of command-line arguments, dataset loading and preprocessing steps, feature extraction, model training progress, hyperparameter optimization, and evaluation results. All logs are saved to `LOG_TXT/log.txt`, providing a detailed, chronological record that facilitates debugging, reproducibility, and experiment tracking. The log file captures warnings, errors, and informational messages, ensuring transparency and traceability for every run.
 
+## Inference Information (`--inference_info` flag)
+
+The pipeline provides an optional `--inference_info` flag to facilitate model inference and result interpretation. When this flag is specified during execution, the script outputs detailed information about the inference process, including:
+
+- The path to the HDF5 file containing the processed data.
+- The path to the trained model to be used for inference.
+- The dataset split to use for inference (e.g., `test`).
+
+**Usage Example:**
+```bash
+python config.py --inference_info "./Processed_images/image_processed.hdf5;./Results/models/svm_model.joblib;test"
+```
+
+**How it works:**
+- The script loads the specified dataset split (e.g., `test_data` and `test_label`) from the provided HDF5 file.
+- It loads the trained model from the given path.
+- The model performs predictions on the loaded data.
+- Evaluation metrics (such as accuracy, precision, recall, F1-score, ROC AUC, and confusion matrix) are computed if ground truth labels are available.
+- All inference results, including predicted class labels, confidence scores (if supported), and a summary of metrics, are saved to `Results/Inference/inference_report.txt`.
+
+> **Important:**  
+> To ensure correct inference results, the dataset stored in the HDF5 file must have undergone exactly the same preprocessing steps (such as resizing, normalization, feature extraction, etc.) as those used during model training.  
+> Additionally, it is recommended to use the same version of `scikit-learn = 1.3.2` as was used for training, since version differences may cause incompatibilities when loading saved models.
+
 ## Installation
 
 To set up the environment and install all required dependencies for this project, you have two options: using `conda` (recommended for reproducibility) or `pip`.

@@ -2,13 +2,41 @@ import os
 import joblib
 from utils import Logger
 from utils import checks as ch
+from utils import ModelEvaluator
 from model import RandomForestModel, SHVotingEnsemble, KNNModel, SVMModel 
 from utils import flatten_features, process, create_generator, train_with_data
+import h5py
 
 
 def main(args):
     log = Logger(name="main", level=10)
     log.info("Stating the program...")
+
+    # Inference mode
+    if hasattr(args, 'evaluate_model') and args.evaluate_model:
+        try:
+            hdf5_path, model_path, dataset = args.evaluate_model.split(';')
+            log.info(f"Inference mode: Loading data from {hdf5_path}, model from {model_path}, dataset: {dataset}")
+
+            data = dataset + "_data"
+            label = dataset + "_label"
+
+            # Load data
+            with h5py.File(hdf5_path, 'r') as f:
+                X_test = f[data][:]
+                y_test = f[label][:]
+            X_test = flatten_features(X_test)
+
+            # Load model
+            model = joblib.load(model_path)
+            evaluator = ModelEvaluator(model)
+            evaluator.evaluate(X_test, y_test)
+
+            log.info("Evaluate model results saved to Results/Inference/inference_report.txt")
+            return
+        except Exception as e:
+            log.error(f"Evaluate model failed: {e}")
+            raise
 #---------------------------------------------------------------------------------------------#
 #Check parsers
     # Perform all argument verifications
@@ -245,5 +273,7 @@ def main(args):
         log.info("Ensemble model saved as ensemble_model.joblib.")
         log.info("Ensemble model evaluation completed successfully.")
     log.info("Program completed successfully. :)")
+
+
 if __name__ == "__main__":
     main()

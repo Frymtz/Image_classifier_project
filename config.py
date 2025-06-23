@@ -68,6 +68,17 @@ if __name__ == "__main__":
     group_models.add_argument('--model', choices=['rf', 'knn', 'svm', 'ensemble', 'all'], nargs='+',
                              help="Choose model(s): rf, knn, svm, ensemble")
 
+    group_inference = parser.add_argument_group('Inference Parameters')
+    group_inference.add_argument(
+        '--evaluate_model',
+        type=str,
+        help=(
+            "String with parameters separated by ';' in the order: "
+            "hdf5_path;model_path;dataset\n"
+            "Example: "
+            "'./data/test.hdf5;./models/svm_model.h5;test'")
+    )
+
     args = parser.parse_args()
 
     # Check if all arguments are None
@@ -78,6 +89,7 @@ if __name__ == "__main__":
         (not args.resize) and
         (not args.extract_technique) and
         (not args.model)
+        and (not args.evaluate_model)
     ):
         log.error("All arguments are None. Please provide valid arguments.")
         raise Exception("All arguments are None. Please provide valid arguments.")
