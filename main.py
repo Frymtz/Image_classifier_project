@@ -1,4 +1,5 @@
 import os
+import joblib
 from utils import Logger
 from utils import checks as ch
 from model import RandomForestModel, SHVotingEnsemble, KNNModel, SVMModel 
@@ -73,11 +74,15 @@ def main(args):
             y_test = data['test_label']
             log.info("Data loaded successfully.")
 
+            os.makedirs("Results/Trained_models", exist_ok=True)
+
             if model[0].lower() == "rf" or model[0].lower() == "all":
                 log.info("Training Random Forest model...")
                 rf_model = RandomForestModel()
                 rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
                 rf_model.score(X_test, y_test)
+                joblib.dump(rf_model, "Results/Trained_models/rf_model.joblib")
+                log.info("Random Forest model saved as rf_model.joblib.")
                 log.info("Random Forest model evaluation completed successfully.")
 
             if model[0].lower() == "knn" or model[0].lower() == "all":   
@@ -85,6 +90,8 @@ def main(args):
                 knn_model = KNNModel()
                 knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 knn_model.score(X_test, y_test)
+                joblib.dump(knn_model, "Results/Trained_models/knn_model.joblib")
+                log.info("KNN model saved as knn_model.joblib.")
                 log.info("KNN model evaluation completed successfully.")
 
             if model[0].lower() == "svm" or model[0].lower() == "all":
@@ -92,6 +99,8 @@ def main(args):
                 svm_model = SVMModel()
                 svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
                 svm_model.score(X_test, y_test)
+                joblib.dump(svm_model, "Results/Trained_models/svm_model.joblib")
+                log.info("SVM model saved as svm_model.joblib.")
                 log.info("SVM model evaluation completed successfully.")
 
             if model[0].lower() == "ensemble" or model[0].lower() == "all":
@@ -105,6 +114,8 @@ def main(args):
                 
                 ensemble.fit(X_train, y_train)
                 ensemble.score(X_test, y_test)
+                joblib.dump(ensemble, "Results/Trained_models/ensemble_model.joblib")
+                log.info("Ensemble model saved as ensemble_model.joblib.")
                 log.info("Ensemble model evaluation completed successfully.")
 
         except Exception as e:
@@ -230,6 +241,8 @@ def main(args):
         
         X_test = [X_test_rf, X_test_knn, X_test_svm]
         ensemble.score(X_test, y_test)
+        joblib.dump(ensemble, "Results/Trained_models/ensemble_model.joblib")
+        log.info("Ensemble model saved as ensemble_model.joblib.")
         log.info("Ensemble model evaluation completed successfully.")
     log.info("Program completed successfully. :)")
 if __name__ == "__main__":
