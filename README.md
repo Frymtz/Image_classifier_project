@@ -87,7 +87,7 @@ The project can be run using the `config.py` script, which parses command-line a
 1. Run with specific extraction technique and model:
 
 ```bash
-python config.py -tr ./data/train_images ./data/train_labels.csv 80 -va ./data/val_images ./data/val_labels.csv 10 -te ./data/test_images ./data/test_labels.csv 10 --resize 64 64 -et hog --model rf
+python config.py -tr ./data/train_images.png ./data/train_labels.txt 80 -va ./data/val_images.png ./data/val_labels.txt 10 -te ./data/test_images.png ./data/test_labels.txt 10 --resize 64 64 -et hog --model rf
 ```
 
 This command will:
@@ -100,7 +100,7 @@ This command will:
 2. Find the best feature for all models:
 
 ```bash
-python config.py -tr ./data/train_images ./data/train_labels.csv -va ./data/val_images ./data/val_labels.csv -te ./data/test_images ./data/test_labels.csv --model all
+python config.py -tr ./data/train_images.png ./data/train_labels.txt -va ./data/val_images.png ./data/val_labels.txt -te ./data/test_images.png ./data/test_labels.txt --model all
 ```
 
 This command will:
@@ -112,7 +112,7 @@ This command will:
 3. Train all models with default settings (no specific feature extraction or resize):
 
 ```bash
-python config.py -tr ./data/train_images ./data/train_labels.csv -va ./data/val_images ./data/val_labels.csv -te ./data/test_images ./data/test_labels.csv --model all
+python config.py -tr ./data/train_images.png ./data/train_labels.txt -va ./data/val_images.png ./data/val_labels.txt -te ./data/test_images.png ./data/test_labels.txt --model all
 ```
 
 This assumes ``main.py`` handles default ``extraction_technique`` and ``resize`` if not provided, typically meaning raw pixel values without resizing. It will train and evaluate Random Forest, KNN, SVM, and the Ensemble model.
