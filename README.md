@@ -41,10 +41,10 @@ Resizing: Images can be resized to custom dimensions.
 - **Best Feature Selection**: Automatically identifies the best feature extraction technique for Random Forest, KNN, and SVM models based on F1-score.
 - **Data Augmentation**: Includes techniques like mirroring, flipping, rotation, adding Gaussian noise, and changing brightness to balance datasets.
 - **Model Training & Evaluation**:
-- **Supported Models**: Random Forest (rf), K-Nearest Neighbors (knn), Support Vector Machine (svm).
-- **Hyperparameter Tuning**: Uses Optuna for optimizing model hyperparameters to maximize F1-score.
-- Ensemble Learning: Implements a soft voting ensemble (ensemble) that combines predictions from trained Random Forest, KNN, and SVM models.
-- **Metrics**: Calculates and saves accuracy, precision, recall, F1-score, ROC AUC, and confusion matrices for each model.
+    - **Supported Models**: Random Forest (rf), K-Nearest Neighbors (knn), Support Vector Machine (svm).
+    - **Hyperparameter Tuning**: Uses Optuna for optimizing model hyperparameters to maximize F1-score.
+    - **Ensemble Learning**: Implements a soft voting ensemble (ensemble) that combines predictions from trained Random Forest, KNN, and SVM models.
+    - **Metrics**: Calculates and saves accuracy, precision, recall, F1-score, ROC AUC, and confusion matrices for each model.
 - **HDF5 Integration**: Processes and saves image data into HDF5 files for efficient storage and retrieval.
 - **Comprehensive Logging**: Detailed logs of program execution, arguments, and model training progress are saved.
 
