@@ -296,18 +296,23 @@ All program activities, including argument verification, dataset creation, and m
 ```
 
 ## Results
+After running the classification pipeline, performance metrics (Accuracy, Precision, Recall, F1 Score, ROC AUC) and visualization (Confusion Matrix, ROC Curve) for each trained model (Random Forest, KNN, SVM, and Ensemble) are saved in their respective directories under the ``Results/`` folder.
 
-Pre-processing used: Resize 24x24 + correlogram
+For example, the metrics for the SVM model can be found in ``Results/SVM/metrics.txt``. Similarly, for Random Forest, results are in ``Results/RandomForest/metrics.txt``, for KNN in ``Results/KNN/metrics.txt``, and for the Ensemble model in ``Results/Ensemble/metrics.txt``.
 
-> **Note:** The main evaluation metric for model selection and reporting is **Recall**.
+## Logging
+All program activities, including argument verification, dataset creation, and model training progress, are logged to ``LOG_TXT/log.txt``. This file provides a detailed chronological record of the execution.
 
-After running the classification pipeline, a comprehensive set of performance metrics—**Accuracy**, **Precision**, **Recall**, **F1 Score**, and **ROC AUC**—is computed for each trained model (Random Forest, KNN, SVM, and Ensemble). These metrics, along with visualizations such as the **Confusion Matrix** and **ROC Curve** images, are saved in their respective directories under the `Results/` folder.
+## Test Results
 
-For example:
-- SVM results: `Results/SVM/metrics.txt`, `Results/SVM/confusion_matrix.png`, `Results/SVM/roc_curve.png`
-- Random Forest results: `Results/RandomForest/metrics.txt`, `Results/RandomForest/confusion_matrix.png`, `Results/RandomForest/roc_curve.png`
-- KNN results: `Results/KNN/metrics.txt`, `Results/KNN/confusion_matrix.png`, `Results/KNN/roc_curve.png`
-- Ensemble results: `Results/Ensemble/metrics.txt`, `Results/Ensemble/confusion_matrix.png`, `Results/Ensemble/roc_curve.png`
+<p align="center">
+  <img src="Results\RandomForest\confusion_matrix.png" alt="App Preview" width="400"/>
+  <br>
+  <em>Fig 1: Confusion Matrix obtained by RandoForest Model</em>
+</p>
 
-These outputs allow for detailed analysis and comparison of model performance, with a particular emphasis on **Recall** as the primary metric.
-
+<p align="center">
+  <img src="Results\RandomForest\roc_curve.png" alt="App Preview" width="400"/>
+  <br>
+  <em>Fig 2: ROC curve obtained by RandoForest Model</em>
+</p>
