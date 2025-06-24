@@ -320,7 +320,7 @@ These results, while already strong, represent what we consider a baseline perfo
 The current implementation serves as a proof-of-concept for the classifier's capabilities, with the understanding that its full potential would be realized with access to greater computational resources for the complete feature optimization pipeline.
 
 ### Test Results
-The Randon Forest model achieves an overall accuracy of approximately 80.8% and an ROC AUC score of 79.7%. While these numbers might seem reasonable at first, a deeper look at the precision, recall, and confusion matrix reveals significant issues, primarily driven by a class imbalance in the dataset. The model struggles to correctly identify the positive class.
+The Random Forest classifier demonstrated moderately strong performance in our evaluation, achieving an overall accuracy of 80.82% (0.8082) and a ROC AUC score of 79.71% (0.7971). As shown in the accompanying confusion matrix visualization (Fig 1), the model produced 1130 true negatives and 92 true positives, but struggled with 211 false positives and 79 false negatives - numbers that reveal critical limitations despite the apparently good accuracy.
 
 <p align="center">
   <img src="Results\RandomForest\confusion_matrix.png" alt="App Preview" width="400"/>
@@ -328,7 +328,7 @@ The Randon Forest model achieves an overall accuracy of approximately 80.8% and 
   <em>Fig 1: Confusion Matrix obtained by RandoForest Model</em>
 </p>
 
-The dataset is highly imbalanced, with the negative class outnumbering the positive class by nearly 8 to 1. In such cases, accuracy is a misleading metric. The model correctly identifies 69% of all actual positive cases. This means it fails to detect 31% of them. When the model predicts an instance is positive, it is correct only 61.9% of the time. The remaining 38.1% are false alarms. This is the harmonic mean of precision and recall. A score of ~64% indicates a mediocre balance between the two. The model is neither particularly precise nor particularly good at capturing all positive instances.
+The ROC curve (Fig 2) visually confirms this moderate performance, with an AUC of 0.7971 indicating better-than-random but less-than-ideal discrimination between classes. The curve's shape suggests particular difficulty in achieving high true positive rates without simultaneously increasing false positives, a common challenge in imbalanced datasets like ours which shows an 8.4:1 negative-to-positive ratio (1341 negative cases versus 171 positive).
 
 <p align="center">
   <img src="Results\RandomForest\roc_curve.png" alt="App Preview" width="400"/>
@@ -336,4 +336,10 @@ The dataset is highly imbalanced, with the negative class outnumbering the posit
   <em>Fig 2: ROC curve obtained by RandoForest Model</em>
 </p>
 
-The ROC AUC score of 0.797 suggests that the model has a decent, but not great, ability to distinguish between the two classes. It performs better than random chance (which would be 0.5), but there is substantial room for improvement.
+This severe class imbalance fundamentally skews the model's behavior. While the 69.03% recall means the model catches about 7 in 10 actual positive cases, the 31% missed (79 false negatives) could be dangerously high for medical applications. Similarly, the 61.91% precision indicates that nearly 4 out of 10 positive predictions are false alarms (211 false positives out of 303 total positive calls). The F1-score of 63.72% mathematically captures this imperfect balance between precision and recall.
+
+The visualization of the confusion matrix (Fig 1) makes these tradeoffs particularly clear. We can observe how the model's predictions skew heavily toward the negative class, with the left column (predicted negatives) containing both the impressive 1130 true negatives but also the concerning 79 missed positives. Meanwhile, the right column (predicted positives) shows the modest 92 correct identifications alongside the problematic 211 incorrect ones.
+
+Several improvement pathways appear promising. First, techniques like class weighting or synthetic minority oversampling (SMOTE) could address the imbalance. Second, threshold adjustment might help rebalance the error types - the ROC curve (Fig 2) suggests room for such optimization. Third, alternative algorithms like weighted XGBoost or ensemble methods might better handle the minority class. Finally, feature engineering informed by medical domain knowledge could uncover more reliable predictors.
+
+While these results establish a reasonable baseline, the 31% false negative rate visible in the confusion matrix (Fig 1) remains unacceptable for clinical use. The current ROC curve position (Fig 2) suggests we should aim to push the AUC beyond 0.85 while maintaining at least 80% recall. Future work will focus on achieving this through the described methods while monitoring precision to prevent excessive false alarms.
