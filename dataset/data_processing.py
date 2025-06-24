@@ -74,7 +74,9 @@ class ImageDatasetGenerator:
         images = []
         for path in tqdm(paths, desc="[INFO] Loading raw images"):
             img_path = os.path.join(base_dir, path) if base_dir else path
-            img = Image.open(img_path).convert('L') # Convert to grayscale
+            img = Image.open(img_path)
+            if self.height_width:  # height_width deve ser uma tupla (width, height)
+                img = img.resize(self.height_width)
             images.append(np.array(img))
         return np.stack(images)
 

@@ -297,6 +297,8 @@ All program activities, including argument verification, dataset creation, and m
 
 ## Results
 
+Pre-processing used: Resize 24x24 + correlogram
+
 > **Note:** The main evaluation metric for model selection and reporting is **Recall**.
 
 After running the classification pipeline, a comprehensive set of performance metrics—**Accuracy**, **Precision**, **Recall**, **F1 Score**, and **ROC AUC**—is computed for each trained model (Random Forest, KNN, SVM, and Ensemble). These metrics, along with visualizations such as the **Confusion Matrix** and **ROC Curve** images, are saved in their respective directories under the `Results/` folder.

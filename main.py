@@ -107,7 +107,7 @@ def main(args):
             if model[0].lower() == "rf" or model[0].lower() == "all":
                 log.info("Training Random Forest model...")
                 rf_model = RandomForestModel()
-                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=1)
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
                 rf_model.score(X_test, y_test)
                 joblib.dump(rf_model, "Results/Trained_models/rf_model.joblib")
                 log.info("Random Forest model saved as rf_model.joblib.")
@@ -116,7 +116,7 @@ def main(args):
             if model[0].lower() == "knn" or model[0].lower() == "all":   
                 log.info("Training KNN model...")
                 knn_model = KNNModel()
-                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
                 knn_model.score(X_test, y_test)
                 joblib.dump(knn_model, "Results/Trained_models/knn_model.joblib")
                 log.info("KNN model saved as knn_model.joblib.")
@@ -125,7 +125,7 @@ def main(args):
             if model[0].lower() == "svm" or model[0].lower() == "all":
                 log.info("Training SVM model...")
                 svm_model = SVMModel()
-                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
                 svm_model.score(X_test, y_test)
                 joblib.dump(svm_model, "Results/Trained_models/svm_model.joblib")
                 log.info("SVM model saved as svm_model.joblib.")
@@ -133,11 +133,11 @@ def main(args):
 
             if model[0].lower() == "ensemble" or model[0].lower() == "all":
                 rf_model = RandomForestModel()
-                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
+                rf_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
                 knn_model = KNNModel()
-                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
+                knn_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
                 svm_model = SVMModel()
-                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=100)
+                svm_model.fit(X_train, y_train, X_val, y_val, use_optuna=True, n_trials=50)
                 ensemble = SHVotingEnsemble([rf_model, knn_model, svm_model], mode="default")
                 
                 ensemble.fit(X_train, y_train)
@@ -188,9 +188,9 @@ def main(args):
                         X_test, y_test 
                     ) = process(generator, output_path, False)
 
-                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=100)  
-                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=100)
-                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=100)
+                    f1_rf, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=20)  
+                    f1_knn, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=20)
+                    f1_svm, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=20)
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: RANDOM FOREST: {f1_rf}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: KNN: {f1_knn}")
                     log.info(f"F1-score for {technique} | Resize: {resize} | Model: SVM: {f1_svm}")     
@@ -227,7 +227,7 @@ def main(args):
             X_test_rf, y_test 
         ) = process(generator, output_path, False)
 
-        _, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=100)
+        _, rf_model = train_with_data(X_train, y_train, X_val, y_val, model="rf", fit_trials=50)
         
         knn_model = None
         svm_model = None
@@ -245,7 +245,7 @@ def main(args):
             X_test_knn, y_test 
         ) = process(generator_knn, output_path, False)
 
-        _, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=100)
+        _, knn_model = train_with_data(X_train, y_train, X_val, y_val, model="knn", fit_trials=50)
 
         # Train SVM model with best config
         # generator for SVM
@@ -260,7 +260,7 @@ def main(args):
             X_test_svm, y_test 
         ) = process(generator_svm, output_path, False)
                 
-        _, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=100)
+        _, svm_model = train_with_data(X_train, y_train, X_val, y_val, model="svm", fit_trials=50)
 
         log.info("Final Random Forest, KNN and SVM model trained with best configuration.")
         
