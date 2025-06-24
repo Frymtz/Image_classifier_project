@@ -302,6 +302,12 @@ For example, the metrics for the SVM model can be found in ``Results/SVM/metrics
 
 The results obtained from our Random Forest classifier demonstrate excellent performance across all key metrics, as evidenced by the quantitative measures and visualizations shown in Figure 1 (Confusion Matrix) and Figure 2 (ROC Curve). The model achieved an overall accuracy of 86.13%, with particularly strong performance in precision (88.97%) and recall (86.13%), indicating a well-balanced classifier that maintains high predictive power while effectively identifying positive cases.
 
+<p align="center">
+  <img src="Results\RandomForest\confusion_matrix.png" alt="App Preview" width="400"/>
+  <br>
+  <em>Fig 1: Confusion Matrix obtained by RandoForest Model</em>
+</p>
+
 The confusion matrix (Figure 1) reveals the model's detailed classification behavior:
 
 - Exceptional specificity with 8,869 true negatives and only 33 false positives
@@ -309,6 +315,13 @@ The confusion matrix (Figure 1) reveals the model's detailed classification beha
 - Strong sensitivity with 6,466 true positives, though showing 2,436 false negatives
 
 - The relatively higher number of false negatives compared to false positives suggests the model is somewhat conservative in its positive predictions
+
+  <p align="center">
+  <img src="Results\RandomForest\roc_curve.png" alt="App Preview" width="400"/>
+  <br>
+  <em>Fig 2: ROC curve obtained by RandoForest Model</em>
+</p>
+
 
 The ROC curve (Figure 2) confirms the model's outstanding discriminative ability with an AUC-ROC of 0.972, approaching near-perfect classification performance. This near-ideal AUC score indicates the model can effectively separate the positive and negative classes across all classification thresholds.
 
@@ -327,18 +340,3 @@ These results, while already strong, represent what we consider a baseline perfo
 - Identify more robust feature combinations specific to this dataset
 
 The current implementation serves as a proof-of-concept for the classifier's capabilities, with the understanding that its full potential would be realized with access to greater computational resources for the complete feature optimization pipeline.
-
-
-## Test Results
-
-<p align="center">
-  <img src="Results\RandomForest\confusion_matrix.png" alt="App Preview" width="400"/>
-  <br>
-  <em>Fig 1: Confusion Matrix obtained by RandoForest Model</em>
-</p>
-
-<p align="center">
-  <img src="Results\RandomForest\roc_curve.png" alt="App Preview" width="400"/>
-  <br>
-  <em>Fig 2: ROC curve obtained by RandoForest Model</em>
-</p>
