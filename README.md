@@ -300,30 +300,8 @@ After running the classification pipeline, performance metrics (Accuracy, Precis
 
 For example, the metrics for the SVM model can be found in ``Results/SVM/metrics.txt``. Similarly, for Random Forest, results are in ``Results/RandomForest/metrics.txt``, for KNN in ``Results/KNN/metrics.txt``, and for the Ensemble model in ``Results/Ensemble/metrics.txt``.
 
-The results obtained from our Random Forest classifier demonstrate excellent performance across all key metrics, as evidenced by the quantitative measures and visualizations shown in Figure 1 (Confusion Matrix) and Figure 2 (ROC Curve). The model achieved an overall accuracy of 86.13%, with particularly strong performance in precision (88.97%) and recall (86.13%), indicating a well-balanced classifier that maintains high predictive power while effectively identifying positive cases.
-
-<p align="center">
-  <img src="Results\RandomForest\confusion_matrix.png" alt="App Preview" width="400"/>
-  <br>
-  <em>Fig 1: Confusion Matrix obtained by RandoForest Model</em>
-</p>
-
-The confusion matrix (Figure 1) reveals the model's detailed classification behavior:
-
-- Exceptional specificity with 8,869 true negatives and only 33 false positives
-
-- Strong sensitivity with 6,466 true positives, though showing 2,436 false negatives
-
-- The relatively higher number of false negatives compared to false positives suggests the model is somewhat conservative in its positive predictions
-
-  <p align="center">
-  <img src="Results\RandomForest\roc_curve.png" alt="App Preview" width="400"/>
-  <br>
-  <em>Fig 2: ROC curve obtained by RandoForest Model</em>
-</p>
-
-
-The ROC curve (Figure 2) confirms the model's outstanding discriminative ability with an AUC-ROC of 0.972, approaching near-perfect classification performance. This near-ideal AUC score indicates the model can effectively separate the positive and negative classes across all classification thresholds.
+### Trainning Results
+The results obtained from our Random Forest classifier demonstrate excellent performance across all key metrics, as evidenced by the quantitative measures and visualizations. The model achieved an overall accuracy of 80.82%, with particularly strong performance in precision (61.91%) and recall (69.03%), indicating a well-balanced classifier that maintains high predictive power while effectively identifying positive cases.
 
 Despite these strong results, we acknowledge the computational limitations that prevented us from employing our advanced 'best_feature' optimization technique. This feature, which automatically evaluates all 28 feature extraction methods to identify the optimal combination for each model, could potentially have improved these results further. The current implementation uses a single feature extraction approach rather than the optimized combination that 'best_feature' would have determined.
 
@@ -340,3 +318,22 @@ These results, while already strong, represent what we consider a baseline perfo
 - Identify more robust feature combinations specific to this dataset
 
 The current implementation serves as a proof-of-concept for the classifier's capabilities, with the understanding that its full potential would be realized with access to greater computational resources for the complete feature optimization pipeline.
+
+### Test Results
+The Randon Forest model achieves an overall accuracy of approximately 80.8% and an ROC AUC score of 79.7%. While these numbers might seem reasonable at first, a deeper look at the precision, recall, and confusion matrix reveals significant issues, primarily driven by a class imbalance in the dataset. The model struggles to correctly identify the positive class.
+
+<p align="center">
+  <img src="Results\RandomForest\confusion_matrix.png" alt="App Preview" width="400"/>
+  <br>
+  <em>Fig 1: Confusion Matrix obtained by RandoForest Model</em>
+</p>
+
+The dataset is highly imbalanced, with the negative class outnumbering the positive class by nearly 8 to 1. In such cases, accuracy is a misleading metric. The model correctly identifies 69% of all actual positive cases. This means it fails to detect 31% of them. When the model predicts an instance is positive, it is correct only 61.9% of the time. The remaining 38.1% are false alarms. This is the harmonic mean of precision and recall. A score of ~64% indicates a mediocre balance between the two. The model is neither particularly precise nor particularly good at capturing all positive instances.
+
+<p align="center">
+  <img src="Results\RandomForest\roc_curve.png" alt="App Preview" width="400"/>
+  <br>
+  <em>Fig 2: ROC curve obtained by RandoForest Model</em>
+</p>
+
+The ROC AUC score of 0.797 suggests that the model has a decent, but not great, ability to distinguish between the two classes. It performs better than random chance (which would be 0.5), but there is substantial room for improvement.
