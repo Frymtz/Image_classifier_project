@@ -305,13 +305,13 @@ The results obtained from our Random Forest classifier demonstrate excellent per
 
 Despite these strong results, we acknowledge the computational limitations that prevented us from employing our advanced 'best_feature' optimization technique. This feature, which automatically evaluates all 28 feature extraction methods to identify the optimal combination for each model, could potentially have improved these results further. The current implementation uses a single feature extraction approach rather than the optimized combination that 'best_feature' would have determined.
 
-The F1-Score of 0.6372 demonstrates good harmony between precision and recall, though we note that in medical applications like cancer detection represented by this dataset, we typically prioritize recall even higher to minimize missed positive cases. The current recall of 86.13% means about 14% of actual positive cases were missed - an area where we believe the 'best_feature' optimization could have helped reduce this percentage.
+The F1-Score of 0.6372 demonstrates good harmony between precision and recall, though we note that in medical applications like cancer detection represented by this dataset, we typically prioritize recall even higher to minimize missed positive cases. The current recall of 69.03% means about 31% of actual positive cases were missed - an area where we believe the 'best_feature' optimization could have helped reduce this percentage.
 
 These results, while already strong, represent what we consider a baseline performance level. With additional computational resources to enable the full 'best_feature' optimization pipeline, we anticipate being able to:
 
 - Further reduce the false negative rate
 
-- Potentially improve the AUC score beyond 0.97
+- Potentially improve the AUC score beyond 0.79
 
 - Achieve better balance between precision and recall
 
