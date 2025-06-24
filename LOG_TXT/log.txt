@@ -23,3 +23,6 @@
 2025-06-23 18:46:13,022 [INFO] All arguments verified successfully.
 2025-06-23 18:46:13,022 [INFO] Creating dataset...
 2025-06-23 18:46:13,032 [INFO] Dataset created successfully.
+2025-06-23 22:20:05,396 [INFO] Stating the program...
+2025-06-23 22:20:05,398 [INFO] Inference mode: Loading data from C:\Users\Fritz\Documents\UFPA_8S\IC\Project_1_clean\Processed_images\image_processed.hdf5, model from C:\Users\Fritz\Documents\UFPA_8S\IC\Project_1_clean\Results\Trained_models\rf_model.joblib, dataset: train
+2025-06-23 22:20:08,064 [INFO] Evaluate model results saved to Results/Inference/inference_report.txt

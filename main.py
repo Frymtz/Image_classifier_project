@@ -87,7 +87,10 @@ def main(args):
         except Exception as e:
             log.error(f"Failed to generate HDF5 file: {e}")
             raise
-
+    
+    if model is None:
+        log.info("Program completed successfully. :)")
+        exit(0)
 #---------------------------------------------------------------------------------------------#
     # Classification Model
     if ext_tech != "best_feature":
